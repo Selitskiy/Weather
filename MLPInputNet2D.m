@@ -14,14 +14,14 @@ classdef MLPInputNet2D
         end
 
 
-        function [net, X, Y, B, k_ob] = TrainTensors(net, M, x_in, t_in, y_out, t_out, l_sess, n_sess, norm_fl)
-            [X, Xc, Xr, Ys, Y, B, XI, C, k_ob] = generic_train_tensors2D(M, x_in, t_in, y_out, t_out, l_sess, n_sess, norm_fl);
-            net.mb_size = 2^floor(log2(k_ob));
+        function [net, X, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fl)
+            [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, k_ob] = generic_train_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, n_sess, norm_fl);
+            net.mb_size = 2^floor(log2(k_ob)-3);
         end
 
 
-        function [X2, Y2, Yh2, Bt, k_tob] = TestTensors(net, M, m_in, n_out, l_sess, l_test, t_sess, sess_off, offset, norm_fl)
-            [X2, Xc2, Xr2, Y2s, Y2, Yh2, Bt, k_tob] = w_series_generic_test_tensors(M, m_in, n_out, l_sess, l_test, t_sess, sess_off, offset, norm_fl, 0);
+        function [X2, Y2, Yh2, Bti, Bto, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fl)
+            [X2, Xc2, Xr2, Y2s, Y2, Yh2, Bti, Bto, k_tob] = generic_test_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fl, 0);
         end
 
 

@@ -1,16 +1,16 @@
-classdef AnnNet2D < BaseNet2D & MLPInputNet2D
+classdef ReluNet2D < BaseNet2D & MLPInputNet2D
 
     properties
 
     end
 
     methods
-        function net = AnnNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = ReluNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
 
             net = net@BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
-            net.name = "ann2d";
+            net.name = "relu2d";
 
         end
 
@@ -22,7 +22,9 @@ classdef AnnNet2D < BaseNet2D & MLPInputNet2D
             layers = [
                 featureInputLayer(net.m_in)
                 fullyConnectedLayer(net.k_hid1)
+                reluLayer
                 fullyConnectedLayer(net.k_hid2)
+                reluLayer
                 fullyConnectedLayer(net.n_out)
                 regressionLayer
             ];
