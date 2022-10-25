@@ -12,15 +12,15 @@ classdef LinRegInputNet2D
         end
 
 
-        function [net, Xr, Y, B, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fl)
-            [X, Xc, Xr, Ys, Y, B, XI, C, k_ob] = generic_train_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, n_sess, norm_fl);
+        function [net, Xr, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fl)
+            [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, k_ob] = generic_train_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, n_sess, norm_fl);
 
             net.W1 = zeros([net.n_out, net.m_in+1, n_sess]);
         end
 
 
-        function [Xr2, Y2, Yh2, Bt, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fl)
-            [X2, Xc2, Xr2, Y2s, Y2, Yh2, Bt, k_tob] = generic_test_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fl, 0);
+        function [Xr2, Y2, Yh2, Bti, Bto, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fl)
+            [X2, Xc2, Xr2, Y2s, Y2, Yh2, Bti, Bto, k_tob] = generic_test_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fl, 0);
         end
 
 

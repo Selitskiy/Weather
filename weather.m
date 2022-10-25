@@ -9,7 +9,8 @@ for i=1:ngpu
 end
 
 %% Load data
-dataFile = 'measurements_July2022_cleared.xlsx';
+%dataFile = 'measurements_July2022_cleared.xlsx';
+dataFile = 'measurements_July-August2022_cleared.xlsx';
 
 dataDir = '~/data/Weather_data';
 dataFullName = strcat(dataDir,'/',dataFile);
@@ -28,19 +29,20 @@ t_out = 144; %500;
 
 
 % Leave space for last full label
-l_whole = l_whole_ex - t_out;
+l_whole = (floor(l_whole_ex/t_out)-1)*t_out;  %l_whole_ex - t_out;
 
 % Break the whole dataset in training sessions,
 % Set training session length (with m_in datapoints of length m_in), 
-l_sess = 3*t_in + t_out;
+l_sess = 9*t_in + t_out + t_in;
 
 % No training sessioins that fit into length left after we set aside label
 n_sess = floor(l_whole/l_sess);
 
 
 ini_rate = 0.01; 
-max_epoch = 100;
-norm_fl = 0;
+max_epoch = 300;
+norm_fli = 1;
+norm_flo = 1;
 
 regNets = cell([n_sess, 1]);
 
@@ -54,12 +56,13 @@ for i = 1:n_sess-1
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SigNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
-    regNet = TanhNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
-
+    %regNet = TanhNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+    %regNet = RbfNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+    regNet = LstmNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     modelName = regNet.name;
 
-    [regNet, X, Y, Bi, Bo, k_ob] = regNet.TrainTensors(M, l_sess, n_sess, norm_fl);
+    [regNet, X, Y, Bi, Bo, k_ob] = regNet.TrainTensors(M, l_sess, n_sess, norm_fli, norm_flo);
 
     regNet = regNet.Train(i, X, Y);
 
@@ -84,24 +87,30 @@ l_marg = 1;
 % Number of training sessions with following full-size test sessions 
 t_sess = floor((l_whole - l_sess) / l_test);
 
-[X2, Y2, Yh2, Bti, Bto, k_tob] = regNets{1}.TestTensors(M, l_sess, l_test, t_sess, sess_off, offset, norm_fl);
+[X2, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = regNets{1}.TestTensors(M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo);
 
 %% test
 [X2, Y2] = regNets{1}.Predict(X2, Y2, regNets, t_sess, sess_off, k_tob);
 
-
 %% re-scale in observation bounds
-if(norm_fl)
-    [Y2, Yh2] = regNets{1}.ReScale(Y2, Yh2, Bto, t_sess, sess_off, k_tob);
+if(norm_flo)
+    [Y2, Yhs2] = regNets{1}.ReScale(Y2, Yhs2, Bo, l_sess, t_sess, sess_off, offset, k_tob);
 end
-
 
 %% Calculate errors
 [S2, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = regNets{1}.Calc_mape(Y2, Yh2); 
 
-fprintf('%s, dataFN %s, NormF:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MaxAPErr %f+-%f\n', modelName, dataFile, norm_fl, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MaxAPErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
 
 
 [S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Y2, Yh2); 
 
-fprintf('%s, dataFN %s, NormF:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MaxRSErr %f+-%f\n', modelName, dataFile, norm_fl, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
+
+
+
+%%
+regNets{1}.Err_graph(M, l_whole_ex, Y2, l_whole, l_sess, x_in, t_in, y_out, t_out, k_tob, t_sess, sess_off, offset, l_marg, modelName);
+
+%%
+regNets{1}.TestIn_graph(M, l_whole_ex, X2, l_whole, l_sess, x_in, t_in, y_out, t_out, k_tob, t_sess, sess_off, offset, l_marg);

@@ -15,9 +15,9 @@ classdef ReluNet2D < BaseNet2D & MLPInputNet2D
         end
 
 
-        function [net, X, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fl)
+        function [net, X, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
 
-            [net, X, Y, Bi, Bo, k_ob] = TrainTensors@MLPInputNet2D(net, M, l_sess, n_sess, norm_fl);
+            [net, X, Y, Bi, Bo, k_ob] = TrainTensors@MLPInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
 
             layers = [
                 featureInputLayer(net.m_in)

@@ -1,16 +1,16 @@
-classdef TanhNet2D < BaseNet2D & MLPInputNet2D
+classdef RbfNet2D < BaseNet2D & MLPInputNet2D
 
     properties
 
     end
 
     methods
-        function net = TanhNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = RbfNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
 
             net = net@BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
-            net.name = "tanh2d";
+            net.name = "rbf2d";
 
         end
 
@@ -21,10 +21,8 @@ classdef TanhNet2D < BaseNet2D & MLPInputNet2D
 
             layers = [
                 featureInputLayer(net.m_in)
-                fullyConnectedLayer(net.k_hid1)
-                tanhLayer
-                fullyConnectedLayer(net.k_hid2)
-                tanhLayer
+                GaussianRBFLayer('RBF1', net.m_in, net.k_hid1)
+                GaussianRBFLayer('RBF2', net.k_hid1, net.k_hid2)
                 fullyConnectedLayer(net.n_out)
                 regressionLayer
             ];
