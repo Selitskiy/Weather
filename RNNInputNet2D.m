@@ -20,8 +20,8 @@ classdef RNNInputNet2D < MLPInputNet2D
         end
 
 
-        function [X2, Y2c, Yh2, Yhs2, Bti, Bto, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo)
-            [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, net.k_lob, 0);
+        function [X2, Y2c, Yh2, Yhs2, Bti, Bto, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob)
+            [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(M, net.x_in, net.t_in, net.y_out, net.t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, net.k_lob, k_tob);
 
             Y2c = struct;
             Y2c.Y2s = Y2s;
@@ -52,11 +52,17 @@ classdef RNNInputNet2D < MLPInputNet2D
 
                     %Either
                     %for k = 1:net.k_lob+1
-                    %    [lstmNet, Y2(1, j, i)] = predictAndUpdateState(lstmNet, X2(k, j, i)');
+                    %    [lstmNet, Y2(:, 1, j, i)] = predictAndUpdateState(lstmNet, X2(:, k, j, i));
                     %end
                     %or
                     [lstmNet, Y2s(:, :, j, i)] = predictAndUpdateState(lstmNet, X2(:, :, j, i));
                     Y2(:, 1, j, i) = Y2s(:, end, j, i);
+
+                    %%Without reset
+                    %%lstmNet = regNets{i}.trainedNet;
+                    %%[lstmNet, Y2s(:, end, j, i)] = predictAndUpdateState(lstmNet, X2(:, end, j, i));
+                    %%Y2(:, 1, j, i) = Y2s(:, end, j, i);
+
 
                     % Continue predicting further output points based on previous
                     % predicvtion

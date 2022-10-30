@@ -13,8 +13,8 @@ function [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(
     Y2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
     Yh2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
     Yhs2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
-    Bti = zeros([2, n_xy, k_tob, t_sess-sess_off]);
-    Bto = zeros([2, n_xy, k_tob, t_sess-sess_off]);
+    Bti = zeros([4, n_xy, k_tob, t_sess-sess_off]);
+    Bto = zeros([4, n_xy, k_tob, t_sess-sess_off]);
 
 
     % Re-format test input into session tensor
@@ -27,6 +27,8 @@ function [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(
             Mxw = M(idx-1:idx+k_ob-1, 1:n_xy);
             % scale bounds over observation span
             [Bti(1,:,j,i), Bti(2,:,j,i)] = bounds(Mxw,1);
+            Bti(3,:,j,i) = mean(Mxw,1);
+            Bti(4,:,j,i) = std(Mxw,1);
 
             %Mx = reshape( Mxw', [m_in,1] );
             X2(:, :, j, i) = Mxw';
@@ -35,9 +37,12 @@ function [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(
             Myw = M(idx+k_ob:idx+k_ob-1+t_out, 1:n_xy);
             % scale bounds over observation span
             [Bto(1,:,j,i), Bto(2,:,j,i)] = bounds(Myw,1);
+            Bto(3,:,j,i) = mean(Myw,1);
+            Bto(4,:,j,i) = std(Myw,1);
 
             %Mx = reshape( Mxw', [m_in,1] );
-            Yh2(:, :, j,i) = Myw';
+            Yh2(:, :, j, i) = Myw';
+            Yhs2(:, :, j, i) = Myw';
         end
 
 
@@ -51,8 +56,12 @@ function [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(
                 % bounds over session
                 MinSessi = Bi(1,:,i); 
                 MaxSessi = Bi(2,:,i);
+                MeanSessi = Bi(3,:,i);
+                StdSessi = Bi(4,:,i);
 
-                Mxw = generic_minmax_scale2D(Mxw, MinSessi, MaxSessi);
+                Mxw = generic_mean_std_scale2D(Mxw, MeanSessi, StdSessi);
+                %Mxw = generic_minmax_scale2D(Mxw, MinSessi, MaxSessi);
+                
                 X2(:, :, j, i) = Mxw';
             end
         end
@@ -68,9 +77,13 @@ function [X2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, k_tob] = generic_test_seq_tensors2D(
                 % bounds over session
                 MinSesso = Bo(1,:,i); 
                 MaxSesso = Bo(2,:,i);
+                MeanSesso = Bo(3,:,i);
+                StdSesso = Bo(4,:,i);
 
-                Myw = generic_minmax_scale2D(Myw, MinSesso, MaxSesso);
-                Yh2(:, :, j,i) = Myw';
+                Myw = generic_mean_std_scale2D(Myw, MeanSesso, StdSesso);
+                %Myw = generic_minmax_scale2D(Myw, MinSesso, MaxSesso);
+                
+                Yhs2(:, :, j,i) = Myw';
             end
         end
 
