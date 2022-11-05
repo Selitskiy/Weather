@@ -3,10 +3,12 @@ classdef BaseNet2D
     properties
         name = [];
 
+        x_off
         x_in
         t_in
         m_in
 
+        y_off
         y_out
         t_out
         n_out
@@ -22,12 +24,14 @@ classdef BaseNet2D
     end
 
     methods
-        function net = BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
+            net.x_off = x_off;
             net.x_in = x_in;
             net.t_in = t_in;
             net.m_in = x_in * t_in;
 
+            net.y_off = y_off;
             net.y_out = y_out;
             net.t_out = t_out;
             net.n_out = y_out * t_out;
@@ -44,21 +48,40 @@ classdef BaseNet2D
         function [X, X2] = ReScaleIn(net, X, X2, Bi, n_sess, t_sess, sess_off, k_ob, k_tob)
 
             for i = 1:n_sess
-                % bounds over session
-                %MinSesso = min( Bo(1,:,:,i), [], 3); 
-                %MaxSesso = max( Bo(2,:,:,i), [], 3);
-                MeanSess = mean( Bi(3,:,:,i), 3);
-                StdSess = mean( Bi(4,:,:,i), 3);
-
                 for j = 1:k_ob
-                    Mxw = reshape( X(:, j, i), [net.x_in, net.t_in])';
+                    % bounds over session
+                    %MinSesso = min( Bi(1,:,:,i), [], 3); 
+                    %MaxSesso = max( Bi(2,:,:,i), [], 3);
+                    MeanSess = mean( Bi(3,:,:,i), 3);
+                    StdSess = mean( Bi(4,:,:,i), 3);
+
+                    Mxw = reshape( X(1:net.m_in, j, i), [net.x_in, net.t_in])';
 
                     Mxw = generic_mean_std_rescale2D(Mxw, MeanSess, StdSess);
 
                     Mx = reshape( Mxw', [net.m_in,1] );
-                    X(:, j, i) = Mx(:);
+                    X(1:net.m_in, j, i) = Mx(:);
                 end
             end
+
+
+            for i = 1:t_sess-sess_off
+                % bounds over session
+                %MinSesso = min( Bi(1,:,:,i), [], 3); 
+                %MaxSesso = max( Bi(2,:,:,i), [], 3);
+                MeanSess = mean( Bi(3,:,:,i), 3);
+                StdSess = mean( Bi(4,:,:,i), 3);
+
+                for j = 1:k_tob
+                    Mxw = reshape( X2(1:net.m_in, j, i), [net.x_in, net.t_in])';
+
+                    Mxw = generic_mean_std_rescale2D(Mxw, MeanSess, StdSess);
+
+                    Mx = reshape( Mxw', [net.m_in,1] );
+                    X2(1:net.m_in, j, i) = Mx(:);
+                end
+            end
+
         end
 
 
@@ -89,8 +112,8 @@ classdef BaseNet2D
 
 
             for i = 1:t_sess-sess_off
-                MinSess = min(Bo(1,:,:,i), [], 3);
-                MaxSess = max(Bo(2,:,:,i), [], 3);
+                %MinSess = min(Bo(1,:,:,i), [], 3);
+                %MaxSess = max(Bo(2,:,:,i), [], 3);
                 MeanSess = mean( Bo(3,:,:,i), 3);
                 StdSess = mean( Bo(4,:,:,i), 3);
 
@@ -127,8 +150,8 @@ classdef BaseNet2D
             [S2Q, S2MeanQ, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = generic_calc_rmse2D(Y2, Yh2, net.n_out);
         end
 
-        function Err_graph(net, M, l_whole_ex, Y2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName)
-            generic_err_graph2D(M, l_whole_ex, Y2, l_whole, l_sess, net.x_in, net.t_in, net.y_out, net.t_out, k_tob, t_sess, sess_off, offset, l_marg, modelName);
+        function Err_graph(net, M, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName)
+            generic_err_graph2D(M, l_whole_ex, Y2, Sy2, l_whole, l_sess, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, k_tob, t_sess, sess_off, offset, l_marg, modelName);
         end
 
         function TestIn_graph(net, M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName)

@@ -5,9 +5,9 @@ classdef LinRegNet2D < BaseNet2D & LinRegInputNet2D
     end
 
     methods
-        function net = LinRegNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
-            net = net@BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+            net = net@BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@LinRegInputNet2D();
 
             net.name = "reg2d";

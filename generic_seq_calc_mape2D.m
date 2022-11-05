@@ -1,6 +1,6 @@
-function [S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx]=generic_seq_calc_mape2D(Y2, Yh2, x_in, y_out, t_out)
+function [S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx]=generic_seq_calc_mape2D(Y2, Yh2, y_off, y_out, t_out)
   
-    E2f = abs((Y2(x_in+1:x_in+y_out, 1:t_out, :, :) - Yh2(x_in+1:x_in+y_out, 1:t_out, :, :)) ./ Yh2(x_in+1:x_in+y_out, 1:t_out, :, :));
+    E2f = abs((Y2(end-y_out+1:end, 1:t_out, :, :) - Yh2(end-y_out+1:end, 1:t_out, :, :)) ./ Yh2(end-y_out+1:end, 1:t_out, :, :));
     [skn, skf, sjf, sif] = size(E2f);
 
     S2 = sum(E2f, [2, 3, 4]);

@@ -1,25 +1,40 @@
-function [X, Y, Bi, Bo, k_ob] = generic_train_seq_tensors2D(M, x_in, t_in, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
+function [X, Y, Bi, Bo, Sx, Sy, n_xy, k_ob] = generic_train_seq_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
 
 
     % Number of observations in a session (training label(sequence) does
     % not touch test period    
     k_ob = l_sess - 1;
 
+    %n_xy = x_in + y_out; 
+    %remove possible overlap of x_in and y_out (f.e. for autoregression)
+    x_over = (x_off+x_in)-y_off;
+    if(x_over < 0)
+        x_over = 0;
+    end
+    n_xy = x_in-x_over + y_out;
 
-    n_xy = x_in + y_out; 
 
-    X = zeros([n_xy, k_ob, n_sess]);
+    X = zeros([x_in, k_ob, n_sess]);
     Y = zeros([n_xy, k_ob, n_sess]);
-    Bi = zeros([4, n_xy, n_sess]);
+    Bi = zeros([4, x_in, n_sess]);
     Bo = zeros([4, n_xy, n_sess]);
+
+    %Segment boundaries
+    Sx = zeros([2, n_sess]);
+    Sy = zeros([2, n_sess]);
+
 
     % Re-format input into session tensor
     for i = 1:n_sess
         % scale bounds over session scale
         idx = (i-1)*l_sess + 1;
 
-            
-        Mxw = M(idx:idx+k_ob-1, 1:n_xy);
+        st_idx = idx;
+        end_idx = idx+k_ob-1;
+        Sx(1,i) = st_idx;
+        Sx(2,i) = end_idx;
+
+        Mxw = M(idx:idx+k_ob-1, x_off+1:x_off+x_in);
         % scale bounds over observation span
         [Bi(1,:,i), Bi(2,:,i)] = bounds(Mxw,1);
         Bi(3,:,i) = mean(Mxw,1);
@@ -28,7 +43,13 @@ function [X, Y, Bi, Bo, k_ob] = generic_train_seq_tensors2D(M, x_in, t_in, y_out
         %Mx = reshape( Mxw', [m_in,1] );
         X(:, :, i) = Mxw';
 
-        Myw = M(idx+1:idx+k_ob, 1:n_xy);
+
+        st_idx = idx+1;
+        end_idx = idx+k_ob;
+        Sy(1,i) = st_idx;
+        Sy(2,i) = end_idx;
+
+        Myw = M(idx+1:idx+k_ob, x_off+1:x_off+n_xy);
         % scale bounds over observation span
         [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
         Bo(3,:,i) = mean(Myw,1);
@@ -45,10 +66,10 @@ function [X, Y, Bi, Bo, k_ob] = generic_train_seq_tensors2D(M, x_in, t_in, y_out
             idx = (i-1)*l_sess + 1;
 
             
-            Mxw = M(idx:idx+k_ob-1, 1:n_xy);
+            Mxw = M(idx:idx+k_ob-1, x_off+1:x_off+x_in);
             % bounds over session
-            MinSessi = Bi(1,:,i); 
-            MaxSessi = Bi(2,:,i);
+            %MinSessi = Bi(1,:,i); 
+            %MaxSessi = Bi(2,:,i);
             MeanSessi = Bi(3,:,i);
             StdSessi = Bi(4,:,i);
     
@@ -65,10 +86,10 @@ function [X, Y, Bi, Bo, k_ob] = generic_train_seq_tensors2D(M, x_in, t_in, y_out
             % scale bounds over session scale
             idx = (i-1)*l_sess + 1;
 
-            Myw = M(idx+1:idx+k_ob, 1:n_xy);
+            Myw = M(idx+1:idx+k_ob, x_off+1:x_off+n_xy);
             % bounds over session
-            MinSesso = Bo(1,:,i); 
-            MaxSesso = Bo(2,:,i);
+            %MinSesso = Bo(1,:,i); 
+            %MaxSesso = Bo(2,:,i);
             MeanSesso = Bo(3,:,i);
             StdSesso = Bo(4,:,i);
     

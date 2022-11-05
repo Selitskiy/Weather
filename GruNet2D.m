@@ -15,9 +15,9 @@ classdef GruNet2D < RNNBaseNet2D & RNNInputNet2D
         end
 
 
-        function [net, X, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
+        function [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
 
-            [net, X, Y, Bi, Bo, k_ob] = TrainTensors@RNNInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
+            [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors@RNNInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
 
             sLayers = [
                 sequenceInputLayer(net.x_in+net.y_out)

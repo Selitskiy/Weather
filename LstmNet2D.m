@@ -5,9 +5,9 @@ classdef LstmNet2D < RNNBaseNet2D & RNNInputNet2D
     end
 
     methods
-        function net = LstmNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
-            net = net@RNNBaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+            net = net@RNNBaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@RNNInputNet2D();
 
             net.name = "lstm2d";
@@ -15,15 +15,22 @@ classdef LstmNet2D < RNNBaseNet2D & RNNInputNet2D
         end
 
 
-        function [net, X, Y, Bi, Bo, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
+        function [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
 
-            [net, X, Y, Bi, Bo, k_ob] = TrainTensors@RNNInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
+            [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors@RNNInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
+
+            %remove possible overlap of x_in and y_out (f.e. for autoregression)
+            %x_over = (net.x_off+net.x_in)-net.y_off;
+            %if(x_over < 0)
+            %    x_over = 0;
+            %end
+            %n_xy = net.x_in-x_over + net.y_out;
 
             sLayers = [
-                sequenceInputLayer(net.x_in+net.y_out)
+                sequenceInputLayer(net.x_in)
                 lstmLayer(net.k_hid1)%, 'OutputMode','last')
                 lstmLayer(net.k_hid2)%, 'OutputMode','last')
-                fullyConnectedLayer(net.x_in+net.y_out)
+                fullyConnectedLayer(net.n_xy)
                 regressionLayer
             ];
 

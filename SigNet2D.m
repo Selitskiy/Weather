@@ -5,9 +5,9 @@ classdef SigNet2D < BaseNet2D & MLPInputNet2D
     end
 
     methods
-        function net = SigNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
-            net = net@BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+            net = net@BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
             net.name = "sig2d";
