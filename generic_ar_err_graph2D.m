@@ -1,4 +1,4 @@
-function generic_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in, y_off, y_out, t_out, k_tob, t_sess, sess_off, offset, k_start, modelName)
+function generic_ar_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in, y_off, y_out, t_out, n_xy, k_tob, t_sess, sess_off, offset, k_start, modelName)
 
     %m_in = x_in * t_in;
     
@@ -20,7 +20,7 @@ function generic_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in
     yyaxis left
 
     for k = 1:y_out
-        lp = plot(k_start:l_m, M(k_start:l_m, y_off+k), 'LineStyle', '-', 'Color', 'b', 'MarkerSize', 1, 'LineWidth', 1);
+        lp = plot(k_start:l_m, M(k_start:l_m, y_off+k), 'b', 'MarkerSize', 2, 'LineWidth', 1);
         hold on;
         legIt = strcat('observation ', num2str(k));
         legItems = [legItems, legIt];
@@ -32,13 +32,13 @@ function generic_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in
         y_end2 = max(Sy2(2,:,i));
 
         for j = 1:k_tob
-            Myw = reshape(Y2(:, j, i), [y_out, t_out])';
+            Myw = reshape(Y2(:, j, i), [n_xy, t_out])';
             %lp = plot(Sy(1,j,i):Sy(2,j,i), Myw(:,k)+1, 'm', 'LineWidth', 2);
-            M3(Sy2(1,j,i):Sy2(2,j,i), y_off+1:y_off+y_out) = Myw;
+            M3(Sy2(1,j,i):Sy2(2,j,i), x_off+1:x_off+n_xy) = Myw;
         end
 
         for k = 1:y_out
-            lp = plot(y_st2:y_end2, M3(y_st2:y_end2, y_off+k), 'LineStyle', '-', 'Color', 'r', 'MarkerSize', 1,'LineWidth', 1);
+            lp = plot(y_st2:y_end2, M3(y_st2:y_end2, y_off+k), 'r', 'MarkerSize', 2,'LineWidth', 1);
             hold on;
             legIt = strcat('prediction ', num2str(k));
             legItems = [legItems, legIt];
@@ -60,7 +60,7 @@ function generic_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in
         end
 
         for k = 1:y_out
-            lp = plot(y_st2:y_end2, M4(y_st2:y_end2, y_off+k), 'LineStyle', '-', 'Color', 'g', 'MarkerSize', 1,'LineWidth', 1);
+            lp = plot(y_st2:y_end2, M4(y_st2:y_end2, y_off+k), 'g', 'MarkerSize', 2,'LineWidth', 1);
             hold on;
             legIt = strcat('sess ', num2str(i), ', error ', num2str(k));
             legItems = [legItems, legIt];

@@ -1,10 +1,17 @@
-function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
+function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, n_xy, k_ob] = generic_train_ar_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
 
     % Number of observations in a session
     k_ob = l_sess - t_in + 1 - t_in - t_out;
 
+    %remove possible overlap of x_in and y_out (f.e. for autoregression)
+    x_over = (x_off+x_in)-y_off;
+    if(x_over < 0)
+        x_over = 0;
+    end
+    n_xy = x_in-x_over + y_out;
+
     m_in = x_in * t_in;
-    n_out = y_out * t_out;
+    n_out = n_xy * t_out; %y_out * t_out;
     n_in = y_out * t_in;
 
     % Re-format input into session tensor
@@ -14,11 +21,8 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
     Xr = ones([m_in+1, k_ob, n_sess]);
     Ys = zeros([n_in, k_ob, n_sess]);
     Y = zeros([n_out, k_ob, n_sess]);
-    %Bi = zeros([4, x_in, k_ob, n_sess]);
-    %Bo = zeros([4, y_out, k_ob, n_sess]);
-    %Bos = zeros([4, y_out, k_ob, n_sess]);
     Bi = zeros([4, x_in, n_sess]);
-    Bo = zeros([4, y_out, n_sess]);
+    Bo = zeros([4, n_xy, n_sess]);
     Bos = zeros([4, y_out, n_sess]);
 
     %Segment boundaries
@@ -72,7 +76,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             Sy(1,j,i) = st_idx;
             Sy(2,j,i) = end_idx;
 
-            Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
+            Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
             %[Bo(1,:,j,i), Bo(2,:,j,i)] = bounds(Myw,1);
             %Bo(3,:,j,i) = mean(Myw,1);
             %Bo(4,:,j,i) = std(Myw,1);
@@ -86,7 +90,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             I(i_idx) = i;
         end
 
-
+        % normalization over training session
         idx = (i-1)*l_sess;
 
         st_idx = idx+1;
@@ -97,7 +101,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
         [Bi(1,:,i), Bi(2,:,i)] = bounds(Mxw,1);
         Bi(3,:,i) = mean(Mxw,1);
         Bi(4,:,i) = std(Mxw,1);
-            
+
         st_idx = idx+2;
         end_idx = idx+k_ob+t_in;
 
@@ -105,11 +109,11 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
         [Bos(1,:,i), Bos(2,:,i)] = bounds(Myw,1);
         Bos(3,:,i) = mean(Myw,1);
         Bos(4,:,i) = std(Myw,1);
-            
+
         st_idx = idx+1+t_in;
         end_idx = idx+k_ob+t_in+t_out-1;
 
-        Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
+        Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
         [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
         Bo(3,:,i) = mean(Myw,1);
         Bo(4,:,i) = std(Myw,1);
@@ -122,10 +126,6 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             
                 Mxw = M(idx:idx+t_in-1, x_off+1:x_off+x_in);
                 % bounds over session
-                %MinSessi = min( Bi(1,:,:,i), [], 3); 
-                %MaxSessi = max( Bi(2,:,:,i), [], 3);
-                %MeanSessi = mean( Bi(3,:,:,i), 3);
-                %StdSessi = mean( Bi(4,:,:,i), 3);
                 MeanSessi = Bi(3,:,i);
                 StdSessi = Bi(4,:,i);
 
@@ -151,10 +151,6 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             
                 Myw = M(idx+1:idx+t_in, y_off+1:y_off+y_out);
                 % bounds over session
-                %MinSessos = min( Bos(1,:,:,i), [], 3); 
-                %MaxSessos = max( Bos(2,:,:,i), [], 3);
-                %MeanSessos = mean( Bos(3,:,:,i), 3);
-                %StdSessos = mean( Bos(4,:,:,i), 3);
                 MeanSessos = Bos(3,:,i);
                 StdSessos = Bos(4,:,i);
 
@@ -166,12 +162,8 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
                 Ys(:, j, i) = My(:);
 
 
-                Myw = M(idx+t_in:idx+t_in+t_out-1, y_off+1:y_off+y_out);
+                Myw = M(idx+t_in:idx+t_in+t_out-1, x_off+1:x_off+n_xy);
                 % bounds over session
-                %MinSesso = min( Bo(1,:,:,i), [], 3); 
-                %MaxSesso = max( Bo(2,:,:,i), [], 3);
-                %MeanSesso = mean( Bo(3,:,:,i), 3);
-                %StdSesso = mean( Bo(4,:,:,i), 3);
                 MeanSesso = Bo(3,:,i);
                 StdSesso = Bo(4,:,i);
 

@@ -1,14 +1,12 @@
 classdef LinRegInputNet2D
 
     properties
-        W1
+        W1 = [];
 
     end
 
     methods
         function net = LinRegInputNet2D()
-            W1 = [];
-
         end
 
 

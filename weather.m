@@ -21,18 +21,21 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 
 
 % input dimesion (parms x days)
-%x_off = 10;
-%x_in = 3;
+x_off = 10;
+x_in = 3;
+
 %x_off = 0;
 %x_in = 13;
-x_off = 0;
-x_in = 10;
-t_in = 144; %500;
+
+%x_off = 0;
+%x_in = 10;
+t_in = 144;
+
 % output dimensions (parms x days)
 y_off = 10;
 y_out = 3;
-t_out = 144; %500;
-
+t_out = 144;
+ts_out = 12; 
 
 % Leave space for last full label
 l_whole = l_whole_ex - t_out;
@@ -68,7 +71,7 @@ regNets = cell([n_sess, 1]);
 %% Train or pre-load regNets
 for i = 1:n_sess
 
-    %regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
@@ -76,7 +79,9 @@ for i = 1:n_sess
     %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TanhNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
-    regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+
+    %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     modelName = regNet.name;
@@ -123,19 +128,19 @@ if(norm_flo)
 end
 
 %% Calculate errors
-[S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = regNets{1}.Calc_mape(Y2, Yh2); 
+[Em, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = regNets{1}.Calc_mape(Y2, Yh2); 
 
-fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MaxAPErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MeanMaxAPErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
 
 
-[S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Y2, Yh2); 
+[Er, S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Y2, Yh2); 
 
-fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
 
 
 
 %%
-regNets{1}.Err_graph(M, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName);
+regNets{1}.Err_graph(M, Em, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName);
 
 %%
 %regNets{1}.TestIn_graph(M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName);

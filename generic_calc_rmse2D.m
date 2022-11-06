@@ -1,4 +1,4 @@
-function [S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx]=generic_calc_rmse2D(Y2, Yh2, n_out)
+function [E2f, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx]=generic_calc_rmse2D(Y2, Yh2, n_out)
   
     E2f(:, :, :) = ((Y2(1:n_out, :, :) - Yh2(1:n_out, :, :)) ./ Yh2(1:n_out, :, :)).^2;
     [skf, sjf, sif] = size(E2f);
