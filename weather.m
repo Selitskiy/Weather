@@ -21,21 +21,21 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 
 
 % input dimesion (parms x days)
-x_off = 10;
-x_in = 3;
+%x_off = 10;
+%x_in = 3;
 
 %x_off = 0;
 %x_in = 13;
 
-%x_off = 0;
-%x_in = 10;
+x_off = 0;
+x_in = 10;
 t_in = 144;
 
 % output dimensions (parms x days)
 y_off = 10;
 y_out = 3;
 t_out = 144;
-ts_out = 12; 
+ts_out = 36; 
 
 % Leave space for last full label
 l_whole = l_whole_ex - t_out;
@@ -46,7 +46,7 @@ l_whole = l_whole_ex - t_out;
 % Break the whole dataset in training sessions,
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
-l_sess = 12*t_in + t_out + t_in;
+l_sess = 14*t_in + t_out + t_in;
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -71,16 +71,23 @@ regNets = cell([n_sess, 1]);
 %% Train or pre-load regNets
 for i = 1:n_sess
 
-    regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    %regNet = TanhNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
-    %regNet = RbfNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+    regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = AnnNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = ReluNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = KgNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+
+    %regNet = SigNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = TanhNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
+    %regNet = RbfNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 

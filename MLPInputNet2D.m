@@ -1,13 +1,13 @@
 classdef MLPInputNet2D
 
     properties
-        mb_size
+        mb_size = [];
     end
 
     methods
 
         function net = MLPInputNet2D()
-            net.mb_size = [];
+
         end
 
 

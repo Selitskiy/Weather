@@ -1,16 +1,17 @@
-classdef TanhNet2D < BaseNet2D & MLPInputNet2D
+classdef AnnNetSeq2D < AnnNet2D & BaseNetSeq2D & MLPInputNetSeq2D
 
     properties
 
     end
 
     methods
-        function net = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
+        function net = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch)
 
+            net = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
-            net.name = "tanh2d";
+            net.name = "ann2dseq";
 
         end
 
@@ -22,9 +23,7 @@ classdef TanhNet2D < BaseNet2D & MLPInputNet2D
             layers = [
                 featureInputLayer(net.m_in)
                 fullyConnectedLayer(net.k_hid1)
-                tanhLayer
                 fullyConnectedLayer(net.k_hid2)
-                tanhLayer
                 fullyConnectedLayer(net.n_out)
                 regressionLayer
             ];

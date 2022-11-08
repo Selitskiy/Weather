@@ -1,16 +1,16 @@
 classdef LinRegInputNetSeq2D < LinRegInputNet2D
 
     properties
-        ts_out = 0;
-        n_xy = 0;
-        n_out2 = 0;
+        %ts_out = 0;
+        %n_xy = 0;
+        %n_out2 = 0;
     end
 
     methods
-        function net = LinRegInputNetSeq2D(ts_out)
+        function net = LinRegInputNetSeq2D()%ts_out)
             net = net@LinRegInputNet2D();
 
-            net.ts_out = ts_out;
+            %net.ts_out = ts_out;
         end
 
 
@@ -31,7 +31,7 @@ classdef LinRegInputNetSeq2D < LinRegInputNet2D
 
         function [Xr2, Y2] = Predict(net, Xr2, Y2, regNets, t_sess, sess_off, k_tob)
 
-            for i = 1:t_sess
+            for i = 1:t_sess-sess_off
                 W1 = regNets{i}.W1;
 
                 Xr2i = Xr2(:, :, i);

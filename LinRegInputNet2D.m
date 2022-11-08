@@ -24,15 +24,11 @@ classdef LinRegInputNet2D
 
         function net = Train(net, i, X, Y)
 
-            %W1 = zeros([net.n_out, net.m_in+1, net.n_sess]);
-            %parfor i = 1:net.n_sess
                 Xi = X(:, :, i);
                 Yi = Y(:, :, i);
                 XiT = Xi.';
                 net.W1(:,:,i) = Yi * XiT / (Xi * XiT);
-            %end
 
-            %net.W1 = W1;
         end
 
         function [Xr2, Y2] = Predict(net, Xr2, Y2, regNets, t_sess, sess_off, k_tob)
