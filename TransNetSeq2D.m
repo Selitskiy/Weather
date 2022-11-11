@@ -1,17 +1,17 @@
-classdef TanhNetSeq2D < TanhLayers2D & BaseNetSeq2D & MLPInputNetSeq2D
+classdef TransNetSeq2D < TransLayers2D & BaseNetSeq2D & MLPInputNetSeq2D
 
     properties
 
     end
 
     methods
-        function net = TanhNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch)
+        function net = TransNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch)
 
-            net = net@TanhLayers2D();
+            net = net@TransLayers2D();
             net = net@BaseNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
             net = net@MLPInputNetSeq2D();
 
-            net.name = "tanh2dseq";
+            net.name = "trans2dseq";
 
         end
 
