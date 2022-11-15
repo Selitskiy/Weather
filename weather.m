@@ -24,11 +24,11 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 %x_off = 10;
 %x_in = 3;
 
-x_off = 0;
-x_in = 13;
-
 %x_off = 0;
-%x_in = 10;
+%x_in = 13;
+
+x_off = 0;
+x_in = 10;
 t_in = 144;
 
 % output dimensions (parms x days)
@@ -46,7 +46,7 @@ l_whole = l_whole_ex - t_out;
 % Break the whole dataset in training sessions,
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
-l_sess = 19*t_in + t_out + t_in;
+l_sess = 12*t_in + t_out + t_in;
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -76,10 +76,12 @@ for i = 1:n_sess
     %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
-    %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = AnnNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
@@ -92,7 +94,7 @@ for i = 1:n_sess
     %regNet = TransNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
 
     %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    %regNet = GruNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+    %regNet = GruNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     modelName = regNet.name;
 
@@ -134,7 +136,7 @@ k_tob = 0;
 %end
 
 if(norm_flo)
-    [Y, Y2, Yhs2] = regNets{1}.ReScaleOut(Y, Y2, Yhs2, Bo, n_sess, t_sess, sess_off, k_ob, k_tob);
+    [Y, Y2, Yhs2] = regNets{1}.ReScaleOut(Y, Y2, Yhs2, Bo, Bto, n_sess, t_sess, sess_off, k_ob, k_tob);
 end
 
 %% Calculate errors
@@ -150,7 +152,7 @@ fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RM
 
 
 %%
-regNets{1}.Err_graph(M, Em, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName);
+regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName);
 
 %%
 %regNets{1}.TestIn_graph(M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName);

@@ -89,14 +89,10 @@ classdef BaseNet2D
         end
 
 
-        function [Y, Y2, Yhs2] = ReScaleOut(net, Y, Y2, Yhs2, Bo, n_sess, t_sess, sess_off, k_ob, k_tob)
+        function [Y, Y2, Yhs2] = ReScaleOut(net, Y, Y2, Yhs2, Bo, Bto, n_sess, t_sess, sess_off, k_ob, k_tob)
 
             for i = 1:n_sess
                 % bounds over session
-                %MinSesso = min( Bo(1,:,:,i), [], 3); 
-                %MaxSesso = max( Bo(2,:,:,i), [], 3);
-                %MeanSess = mean( Bo(3,:,:,i), 3);
-                %StdSess = mean( Bo(4,:,:,i), 3);
                 MeanSess = Bo(3,:,i);
                 StdSess = Bo(4,:,i);
 
@@ -118,21 +114,20 @@ classdef BaseNet2D
 
 
             for i = 1:t_sess-sess_off
-                %MinSess = min(Bo(1,:,:,i), [], 3);
-                %MaxSess = max(Bo(2,:,:,i), [], 3);
-                %MeanSess = mean( Bo(3,:,:,i), 3);
-                %StdSess = mean( Bo(4,:,:,i), 3);
-                MeanSess = Bo(3,:,i);
-                StdSess = Bo(4,:,i);
+                %MeanSess = Bo(3,:,i);
+                %StdSess = Bo(4,:,i);
 
                 for j = 1:k_tob
 
                     %idx = (i+sess_off)*l_sess + (j-1)*net.t_out + 1 + offset - net.t_in;
 
+                    MeanSesst = Bto(3,:,j,i);
+                    StdSesst = Bto(4,:,j,i);
+
                     Myw = reshape( Y2(:, j, i), [net.y_out, net.t_out])';
 
                     %Myw = generic_mean_minmax_rescale2D(Myw, MeanSess, MinSess, MaxSess);
-                    Myw = generic_mean_std_rescale2D(Myw, MeanSess, StdSess);
+                    Myw = generic_mean_std_rescale2D(Myw, MeanSesst, StdSesst);
 
                     My = reshape( Myw', [net.n_out,1] );
                     Y2(:, j, i) = My(:);
@@ -141,7 +136,7 @@ classdef BaseNet2D
                     Myw = reshape( Yhs2(:, j, i), [net.y_out, net.t_out])';
 
                     %Myw = generic_mean_minmax_rescale2D(Myw, MeanSess, MinSess, MaxSess);
-                    Myw = generic_mean_std_rescale2D(Myw, MeanSess, StdSess);
+                    Myw = generic_mean_std_rescale2D(Myw, MeanSesst, StdSesst);
 
                     My = reshape( Myw', [net.n_out,1] );
                     Yhs2(:, j, i) = My(:);

@@ -1,0 +1,16 @@
+reg2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.170241+-0.092197 MaxAPErr 0.993314+-0.641453
+reg2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.306946+-0.288978 MaxRSErr 0.288978+-0.146340
+ann2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.156368+-0.081757 MaxAPErr 1.088336+-0.792213
+ann2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.298142+-0.278993 MaxRSErr 0.278993+-0.148673
+relu2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.155359+-0.109872 MaxAPErr 1.202134+-0.957074
+relu2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.312384+-0.282465 MaxRSErr 0.282465+-0.188664
+sig2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.067370+-0.025061 MaxAPErr 0.346871+-0.136902
+sig2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.091745+-0.091716 MaxRSErr 0.091716+-0.003240
+tanh2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.061119+-0.029186 MaxAPErr 0.305826+-0.084677
+tanh2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.079916+-0.079408 MaxRSErr 0.079408+-0.012722
+rbf2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.079540+-0.047797 MaxAPErr 0.336731+-0.114540
+rbf2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.106711+-0.104831 MaxRSErr 0.104831+-0.028204
+lstm2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.052011+-0.017176 MaxAPErr 0.167021+-0.048223
+lstm2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.064171+-0.056917 MaxRSErr 0.056917+-0.016420
+gru2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, MAPErr: 0.053553+-0.032917 MaxAPErr 0.309399+-0.126272
+gru2d, dataFN measurements_July-August2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:3024, Tr_sess:2, Ts_sess:2, RMSErr: 0.075968+-0.068070 MaxRSErr 0.068070+-0.042755

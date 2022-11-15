@@ -93,25 +93,29 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, n_xy, k_ob] = generic_tr
         % normalization over training session
         idx = (i-1)*l_sess;
 
+        %Normalize input and output on the same training-only interval
         st_idx = idx+1;
-        end_idx = idx+k_ob+t_in-1;
+        %end_idx = idx+k_ob+t_in-1;
+        end_idx = idx+k_ob+t_out-1;
 
         Mxw = M(st_idx:end_idx, x_off+1:x_off+x_in);
         % scale bounds over observation span
         [Bi(1,:,i), Bi(2,:,i)] = bounds(Mxw,1);
         Bi(3,:,i) = mean(Mxw,1);
         Bi(4,:,i) = std(Mxw,0,1);
-
+            
         st_idx = idx+2;
-        end_idx = idx+k_ob+t_in;
+        %end_idx = idx+k_ob+t_in;
+        end_idx = idx+k_ob+t_out;
 
         Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
         [Bos(1,:,i), Bos(2,:,i)] = bounds(Myw,1);
         Bos(3,:,i) = mean(Myw,1);
         Bos(4,:,i) = std(Myw,0,1);
-
+            
         st_idx = idx+1+t_in;
-        end_idx = idx+k_ob+t_in+t_out-1;
+        %end_idx = idx+k_ob+t_in+t_out-1;
+        end_idx = idx+k_ob+t_out-1;
 
         Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
         [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);

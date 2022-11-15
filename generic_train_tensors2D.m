@@ -1,4 +1,4 @@
-function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
+function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
 
     % Number of observations in a session
     k_ob = l_sess - t_in + 1 - t_in - t_out;
@@ -12,18 +12,20 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
     X = zeros([m_in, k_ob, n_sess]);
     Xc = zeros([m_in, 1, 1, k_ob, n_sess]);
     Xr = ones([m_in+1, k_ob, n_sess]);
-    Ys = zeros([n_in, k_ob, n_sess]);
+    Xs = zeros([x_in, t_in, k_ob, n_sess]);
+    Ys = zeros([y_out, t_out, k_ob, n_sess]);
+    %Ys = zeros([n_in, k_ob, n_sess]);
     Y = zeros([n_out, k_ob, n_sess]);
     %Bi = zeros([4, x_in, k_ob, n_sess]);
     %Bo = zeros([4, y_out, k_ob, n_sess]);
     %Bos = zeros([4, y_out, k_ob, n_sess]);
     Bi = zeros([4, x_in, n_sess]);
     Bo = zeros([4, y_out, n_sess]);
-    Bos = zeros([4, y_out, n_sess]);
+    %Bos = zeros([4, y_out, n_sess]);
 
     %Segment boundaries
     Sx = zeros([2, k_ob, n_sess]);
-    Sys = zeros([2, k_ob, n_sess]);
+    %Sys = zeros([2, k_ob, n_sess]);
     Sy = zeros([2, k_ob, n_sess]);
 
 
@@ -51,20 +53,21 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             X(1:m_in, j, i) = Mx(:);
             Xc(1:m_in, 1, 1, j, i) = Mx(:);
             Xr(1:m_in, j, i) = Mx(:);
+            Xs(:,:,j,i) = Mxw';
 
 
-            st_idx = idx+1;
-            end_idx = idx+t_in;
-            Sys(1,j,i) = st_idx;
-            Sys(2,j,i) = end_idx;
+            %st_idx = idx+1;
+            %end_idx = idx+t_in;
+            %Sys(1,j,i) = st_idx;
+            %Sys(2,j,i) = end_idx;
 
-            Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
+            %Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
             %[Bos(1,:,j,i), Bos(2,:,j,i)] = bounds(Myw,1);
             %Bos(3,:,j,i) = mean(Myw,1);
             %Bos(4,:,j,i) = std(Myw,1);
 
-            My = reshape( Myw', [n_in,1] );
-            Ys(:, j, i) = My(:);
+            %My = reshape( Myw', [n_in,1] );
+            %Ys(:,:, j, i) = Myw';
 
 
             st_idx = idx+t_in;
@@ -79,6 +82,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
 
             My = reshape( Myw', [n_out,1] );
             Y(:, j, i) = My(:);
+            Ys(:,:, j, i) = Myw';
 
 
             i_idx = (i-1)*k_ob + j;
@@ -89,25 +93,23 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
 
         idx = (i-1)*l_sess;
 
+        %Normalize input and output on the same training-only input interval
         st_idx = idx+1;
-        end_idx = idx+k_ob+t_in-1;
+        %end_idx = idx+k_ob+t_in-1;
+        end_idx = idx+k_ob+t_out-1;
 
         Mxw = M(st_idx:end_idx, x_off+1:x_off+x_in);
         % scale bounds over observation span
         [Bi(1,:,i), Bi(2,:,i)] = bounds(Mxw,1);
         Bi(3,:,i) = mean(Mxw,1);
         Bi(4,:,i) = std(Mxw,0,1);
-            
-        st_idx = idx+2;
-        end_idx = idx+k_ob+t_in;
+         
 
-        Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
-        [Bos(1,:,i), Bos(2,:,i)] = bounds(Myw,1);
-        Bos(3,:,i) = mean(Myw,1);
-        Bos(4,:,i) = std(Myw,0,1);
-            
-        st_idx = idx+1+t_in;
-        end_idx = idx+k_ob+t_in+t_out-1;
+        %Normalize input and output on the same training-only interval
+        %separately for inpout and label-output
+        %st_idx = idx+1+t_in;
+        %%end_idx = idx+k_ob+t_in+t_out-1;
+        %end_idx = idx+k_ob+t_out-1;
 
         Myw = M(st_idx:end_idx, y_off+1:y_off+y_out);
         [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
@@ -136,7 +138,8 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
                 X(1:m_in, j, i) = Mx(:);
                 Xc(1:m_in, 1, 1, j, i) = Mx(:);
                 Xr(1:m_in, j, i) = Mx(:);
-
+                Xs(:,:,j,i) = Mxw';
+                
 
                 i_idx = (i-1)*k_ob + j;
                 XI(1:m_in, i_idx) = Mx(:);
@@ -148,23 +151,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
             for j = 1:k_ob
                 % extract and scale observation sequence
                 idx = (i-1)*l_sess + j;
-            
-                Myw = M(idx+1:idx+t_in, y_off+1:y_off+y_out);
-                % bounds over session
-                %MinSessos = min( Bos(1,:,:,i), [], 3); 
-                %MaxSessos = max( Bos(2,:,:,i), [], 3);
-                %MeanSessos = mean( Bos(3,:,:,i), 3);
-                %StdSessos = mean( Bos(4,:,:,i), 3);
-                MeanSessos = Bos(3,:,i);
-                StdSessos = Bos(4,:,i);
-
-                Myw = generic_mean_std_scale2D(Myw, MeanSessos, StdSessos);
-                %Myw = generic_mean_minmax_scale2D(Myw, MeanSessos, MinSessos, MaxSessos);
-                %Myw = generic_minmax_scale2D(Myw, MinSessos, MaxSessos);
-
-                My = reshape( Myw', [n_in,1] );
-                Ys(:, j, i) = My(:);
-
+                
 
                 Myw = M(idx+t_in:idx+t_in+t_out-1, y_off+1:y_off+y_out);
                 % bounds over session
@@ -181,6 +168,7 @@ function [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, k_ob] = generic_train_te
 
                 My = reshape( Myw', [n_out,1] );
                 Y(:, j, i) = My(:);
+                Ys(:,:, j, i) = Myw';
             end
         end
     end

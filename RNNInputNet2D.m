@@ -66,7 +66,7 @@ classdef RNNInputNet2D < MLPInputNet2D
                 else
                     %Without reset
                     lstmNet = regNets{i}.trainedNet;
-                    [lstmNet, Y2s(:, end, 1, i)] = predictAndUpdateState(lstmNet, X2(:, end-1, 1, i));
+                    %[lstmNet, Y2s(:, end, 1, i)] = predictAndUpdateState(lstmNet, X2(:, end-1, 1, i));
                     %Y2(:, 1, 1, i) = Y2s(:, end, 1, i);
                     X2Last = X2(:, end, 1, i);
                 end

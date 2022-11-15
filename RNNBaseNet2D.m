@@ -11,17 +11,18 @@ classdef RNNBaseNet2D < BaseNet2D
 
         end
 
-        function [Y, Y2, Yhs2] = ReScaleOut(net, Y, Y2, Yhs2, Bo, l_sess, t_sess, sess_off, offset, k_tob)
+        function [Y, Y2, Yhs2] = ReScaleOut(net, Y, Y2, Yhs2, Bo, Bto, l_sess, t_sess, sess_off, offset, k_tob)
 
             for i = 1:t_sess-sess_off
-                %MinSess = Bo(1,:,i);
-                %MaxSess = Bo(2,:,i);
-                MeanSess = Bo(3,:,i);
-                StdSess = Bo(4,:,i);
+                %MeanSess = Bo(3,:,i);
+                %StdSess = Bo(4,:,i);
 
                 for j = 1:k_tob
 
                     %idx = (i+sess_off)*l_sess + (j-1)*net.t_out + 1 + offset - net.t_in;
+
+                    MeanSess = Bto(3,:,j,i);
+                    StdSess = Bto(4,:,j,i);
 
                     %Myw = reshape( Y2(:, j, i), [net.y_out, net.t_out])';
                     Myw = Y2(:, :, j, i)';

@@ -1,7 +1,6 @@
 classdef MLPInputNetSeq2D < MLPInputNet2D
 
     properties
-        %mb_size = [];
     end
 
     methods

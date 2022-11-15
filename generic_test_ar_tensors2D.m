@@ -40,12 +40,19 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
 
             Mw = M(st_idx:end_idx, x_off+1:x_off+x_in);
             [Bti(1,:,j,i), Bti(2,:,j,i)] = bounds(Mw,1);
+            Bti(3,:,j,i) = mean(Mw,1);
+            Bti(4,:,j,i) = std(Mw,0,1);
+
+            Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
+            [Bto(1,:,j,i), Bto(2,:,j,i)] = bounds(Myw,1);
+            Bto(3,:,j,i) = mean(Myw,1);
+            Bto(4,:,j,i) = std(Myw,0,1);
+
 
             Mx = reshape( Mw', [m_in,1] );
             X2(1:m_in, j, i) = Mx(:);
             Xc2(1:m_in, 1, 1, j, i) = Mx(:);
             Xr2(1:m_in, j, i) = Mx(:);
-            %Xr2(2:m_in+1, j, i) = Mx(:);
 
 
             st_idx = idx+t_in;
@@ -57,7 +64,7 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
             My = reshape( Myw', [n_out,1] );
             Yh2(:, j, i) = My(:);
 
-            [Bto(1,:,j,i), Bto(2,:,j,i)] = bounds(Myw,1);
+            %[Bto(1,:,j,i), Bto(2,:,j,i)] = bounds(Myw,1);
 
             My = reshape( Myw', [n_out,1] );
             Yhs2(:, j, i) = My(:);
@@ -70,8 +77,10 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
 
                 Mw = M(idx:idx+t_in-1, x_off+1:x_off+x_in);
                 % bounds over session
-                MeanSessi = Bi(3,:,i);
-                StdSessi = Bi(4,:,i);
+                MeanSessi = Bti(3,:,j,i);
+                StdSessi = Bti(4,:,j,i);
+                %MeanSessi = Bi(3,:,i);
+                %StdSessi = Bi(4,:,i);
 
                 Mw = generic_mean_std_scale2D(Mw, MeanSessi, StdSessi);
                 %Mw = generic_mean_minmax_scale2D(Mw, MeanSessi, MinSessi, MaxSessi);
@@ -81,7 +90,6 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
                 X2(1:m_in, j, i) = Mx(:);
                 Xc2(1:m_in, 1, 1, j, i) = Mx(:);
                 Xr2(1:m_in, j, i) = Mx(:);
-                %Xr2(2:m_in+1, j, i) = Mx(:);
              end
         end
         
@@ -92,8 +100,10 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
 
                 Myw = M(idx+t_in:idx+t_in+t_out-1, x_off+1:x_off+n_xy);
                 % bounds over session
-                MeanSesso = Bo(3,:,i);
-                StdSesso = Bo(4,:,i);
+                MeanSesso = Bto(3,:,j,i);
+                StdSesso = Bto(4,:,j,i);
+                %MeanSesso = Bo(3,:,i);
+                %StdSesso = Bo(4,:,i);
 
                 Myw = generic_mean_std_scale2D(Myw, MeanSesso, StdSesso);
                 %Myw = generic_mean_minmax_scale2D(Myw, MeanSesso, MinSesso, MaxSesso);

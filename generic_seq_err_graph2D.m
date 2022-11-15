@@ -44,24 +44,24 @@ function generic_seq_err_graph2D(M, Em, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, 
 
 
     
-    yyaxis right
+    %yyaxis right
 
-    for i = 1:t_sess-sess_off
-        y_st2 = min(Sy2(1,:,i));
-        y_end2 = max(Sy2(2,:,i));
+    %for i = 1:t_sess-sess_off
+    %    y_st2 = min(Sy2(1,:,i));
+    %    y_end2 = max(Sy2(2,:,i));
 
-        for j = 1:k_tob
-            Mew = Em(:, :, j, i)';
-            M4(Sy2(1,j,i):Sy2(2,j,i), x_off+1:x_off+n_xy) = Mew;
-        end
+    %    for j = 1:k_tob
+    %        Mew = Em(:, :, j, i)';
+    %        M4(Sy2(1,j,i):Sy2(2,j,i), x_off+1:x_off+n_xy) = Mew;
+    %    end
 
-        for k = 1:y_out
-            lp = plot(y_st2:y_end2, M4(y_st2:y_end2, y_off+k), 'g', 'MarkerSize', 1,'LineWidth', 1);
-            hold on;
-            legIt = strcat('sess ', num2str(i), ', error ', num2str(k));
-            legItems = [legItems, legIt];
-        end
-    end
+    %    for k = 1:y_out
+    %        lp = plot(y_st2:y_end2, M4(y_st2:y_end2, y_off+k), 'g', 'MarkerSize', 1,'LineWidth', 1);
+    %        hold on;
+    %        legIt = strcat('sess ', num2str(i), ', error ', num2str(k));
+    %        legItems = [legItems, legIt];
+    %    end
+    %end
 
 
     title(strcat("Model ",modelName))
