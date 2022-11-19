@@ -40,6 +40,12 @@ function [X, Y, Bi, Bo, Sx, Sy, n_xy, k_ob] = generic_train_seq_tensors2D(M, x_o
         Bi(3,:,i) = mean(Mxw,1);
         Bi(4,:,i) = std(Mxw,0,1);
 
+        Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
+        % scale bounds over observation span
+        [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
+        Bo(3,:,i) = mean(Myw,1);
+        Bo(4,:,i) = std(Myw,0,1);
+
         %Mx = reshape( Mxw', [m_in,1] );
         X(:, :, i) = Mxw';
 
@@ -51,9 +57,9 @@ function [X, Y, Bi, Bo, Sx, Sy, n_xy, k_ob] = generic_train_seq_tensors2D(M, x_o
 
         Myw = M(st_idx:end_idx, x_off+1:x_off+n_xy);
         % scale bounds over observation span
-        [Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
-        Bo(3,:,i) = mean(Myw,1);
-        Bo(4,:,i) = std(Myw,0,1);
+        %[Bo(1,:,i), Bo(2,:,i)] = bounds(Myw,1);
+        %Bo(3,:,i) = mean(Myw,1);
+        %Bo(4,:,i) = std(Myw,0,1);
 
         %Mx = reshape( Mxw', [m_in,1] );
         Y(:, :, i) = Myw';

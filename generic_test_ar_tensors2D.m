@@ -1,4 +1,4 @@
-function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic_test_ar_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, n_xy, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob)
+function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic_test_ar_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, n_xy, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob)
     %% Test regression ANN
     if(k_tob == 0)
         [m,~] = size(M);
@@ -15,7 +15,11 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
     X2 = zeros([m_in, k_tob, t_sess-sess_off]);
     Xc2 = zeros([m_in, 1, 1, k_tob, t_sess-sess_off]);
     Xr2 = ones([m_in+1, k_tob, t_sess]);
-    Y2s = zeros([n_in, k_tob, t_sess-sess_off]);
+    Xs2 = zeros([x_in, t_in, k_tob, t_sess-sess_off]);
+    Ys2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
+    Ysh2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
+    Yshs2 = zeros([n_xy, t_out, k_tob, t_sess-sess_off]);
+    %Y2s = zeros([n_in, k_tob, t_sess-sess_off]);
     Y2 = zeros([n_out, k_tob, t_sess-sess_off]);
     Yh2 = zeros([n_out, k_tob, t_sess-sess_off]);
     Yhs2 = zeros([n_out, k_tob, t_sess-sess_off]);
@@ -53,6 +57,7 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
             X2(1:m_in, j, i) = Mx(:);
             Xc2(1:m_in, 1, 1, j, i) = Mx(:);
             Xr2(1:m_in, j, i) = Mx(:);
+            Xs2(:,:,j,i) = Mw';
 
 
             st_idx = idx+t_in;
@@ -68,6 +73,9 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
 
             My = reshape( Myw', [n_out,1] );
             Yhs2(:, j, i) = My(:);
+
+            Ysh2(:,:, j, i) = Myw';
+            Yshs2(:,:, j, i) = Myw';
         end
 
         if(norm_fli)
@@ -90,6 +98,7 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
                 X2(1:m_in, j, i) = Mx(:);
                 Xc2(1:m_in, 1, 1, j, i) = Mx(:);
                 Xr2(1:m_in, j, i) = Mx(:);
+                Xs2(:,:,j,i) = Mw';
              end
         end
         
@@ -111,6 +120,8 @@ function [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic
 
                 My = reshape( Myw', [n_out,1] );
                 Yhs2(:, j, i) = My(:);
+
+                Yshs2(:,:, j, i) = Myw';
             end
         end
 

@@ -1,7 +1,5 @@
 function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in, y_off, y_out, t_out, n_xy, k_tob, t_sess, sess_off, offset, k_start, modelName)
     
-    %y_out = 1;
-    %m_in = x_in * t_in;
     legItems = strings(0);
 
     f = figure();
@@ -19,12 +17,12 @@ function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_
     %yyaxis left
 
     k=1;
-    %for k = 1:y_out
+    for k = 1:y_out
         lp = plot(k_start:l_m, M(k_start:l_m, y_off+k), 'b', 'MarkerSize', 1, 'LineWidth', 1);
         hold on;
         legIt = strcat('observation ', num2str(k));
         legItems = [legItems, legIt];
-    %end
+    end
 
 
     for i = 1:t_sess-sess_off
@@ -36,12 +34,12 @@ function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_
             M3(Sy2(1,j,i):Sy2(2,j,i), y_off+1:y_off+y_out) = Myw;
         end
 
-        %for k = 1:y_out
+        for k = 1:y_out
             lp = plot(y_st2:y_end2, M3(y_st2:y_end2, y_off+k), 'r', 'MarkerSize', 1, 'LineWidth', 1);
             hold on;
             legIt = strcat('sess ', num2str(i), ', channel ', num2str(k));
             legItems = [legItems, legIt];
-        %end
+        end
     end
 
     title(strcat("Model ",modelName))
@@ -65,12 +63,12 @@ function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_
             M4(Sy2(1,j,i):Sy2(2,j,i), y_off+1:y_off+y_out) = Mew;
         end
 
-        %for k = 1:y_out
+        for k = 1:y_out
             lp = plot(y_st2:y_end2, M4(y_st2:y_end2, y_off+k), col(k), 'MarkerSize', 1,'LineWidth', 1);
             hold on;
             legIt = strcat('sess ', num2str(i), ', channel ', num2str(k));
             legItems = [legItems, legIt];
-        %end
+        end
     end
 
 

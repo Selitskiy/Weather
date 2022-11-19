@@ -52,8 +52,16 @@ classdef BaseNetSeq2D < BaseNet2D
             end
         end
 
-        function Err_graph(net, M, l_whole_ex, Y2, Sy2, E, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName)
-            generic_ar_err_graph2D(M, l_whole_ex, Y2, Sy2, E, l_whole, l_sess, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, net.n_xy, k_tob, t_sess, sess_off, offset, l_marg, modelName);
+        function [Em, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = Calc_mape(net, Y2, Yh2)
+            [Em, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = generic_calc_mape2D(Y2, Yh2, net.n_out2); 
+        end
+
+        function [Er, S2Q, S2MeanQ, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = Calc_rmse(net, Y2, Yh2) 
+            [Er, S2Q, S2MeanQ, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = generic_calc_rmse2D(Y2, Yh2, net.n_out2);
+        end
+
+        function Err_graph(net, M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName)
+            generic_ar_err_graph2D(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, net.n_xy, k_tob, t_sess, sess_off, offset, l_marg, modelName);
         end
 
 

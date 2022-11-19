@@ -60,7 +60,7 @@ function generic_ar_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_i
 
         for j = 1:k_tob
             Mew = reshape(Em(:, j, i), [n_xy, t_out])';
-            M4(Sy2(1,j,i):Sy2(2,j,i), x_off+1:x_off+n_xy) = Mew;
+            M4(Sy2(1,j,i):Sy2(2,j,i), x_off+1:y_off+y_out) = Mew;
         end
 
         for k = 1:y_out
@@ -88,8 +88,8 @@ function generic_ar_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_i
         y_end2 = max(Sy2(2,:,i));
 
         for j = 1:k_tob
-            Mew = reshape(Er(:, j, i), [n_xy, t_out])';
-            M4(Sy2(1,j,i):Sy2(2,j,i), x_off+1:x_off+n_xy) = Mew;
+            Mew = reshape(Er(:, j, i), [y_out, t_out])';
+            M4(Sy2(1,j,i):Sy2(2,j,i), y_off+1:y_off+y_out) = Mew;
         end
 
         for k = 1:y_out

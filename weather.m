@@ -21,14 +21,14 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 
 
 % input dimesion (parms x days)
-%x_off = 10;
-%x_in = 3;
+x_off = 10;
+x_in = 3;
 
 %x_off = 0;
 %x_in = 13;
 
-x_off = 0;
-x_in = 10;
+%x_off = 0;
+%x_in = 10;
 t_in = 144;
 
 % output dimensions (parms x days)
@@ -76,12 +76,12 @@ for i = 1:n_sess
     %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
-    regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    %regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = AnnNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);

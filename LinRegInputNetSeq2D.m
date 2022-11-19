@@ -15,7 +15,7 @@ classdef LinRegInputNetSeq2D < LinRegInputNet2D
 
 
         function [net, Xr, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
-            [X, Xc, Xr, Ys, Y, Bi, Bo, XI, C, Sx, Sys, Sy, n_xy, k_ob] = generic_train_ar_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.ts_out, l_sess, n_sess, norm_fli, norm_flo);
+            [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, n_xy, k_ob] = generic_train_ar_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.ts_out, l_sess, n_sess, norm_fli, norm_flo);
 
             net.n_xy = n_xy;
             net.n_out = net.n_xy * net.ts_out;
@@ -24,7 +24,7 @@ classdef LinRegInputNetSeq2D < LinRegInputNet2D
         end
 
         function [Xr2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = TestTensors(net, M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob)
-            [X2, Xc2, Xr2, Y2s, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic_test_ar_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, net.n_xy, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob);
+            [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic_test_ar_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, net.n_xy, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob);
         end
 
 
