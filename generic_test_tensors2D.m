@@ -13,7 +13,7 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
     %n_in = y_out * t_in;
 
     X2 = zeros([m_in, k_tob, t_sess-sess_off]);
-    Xc2 = zeros([m_in, 1, 1, k_tob, t_sess-sess_off]);
+    Xc2 = zeros([x_in, t_out, 1, k_tob, t_sess-sess_off]);
     Xr2 = ones([m_in+1, k_tob, t_sess-sess_off]);
     Xs2 = zeros([x_in, t_in, k_tob, t_sess-sess_off]);
     Ys2 = zeros([y_out, t_out, k_tob, t_sess-sess_off]);
@@ -55,8 +55,8 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
 
             Mx = reshape( Mw', [m_in,1] );
             X2(1:m_in, j, i) = Mx(:);
-            Xc2(1:m_in, 1, 1, j, i) = Mx(:);
             Xr2(1:m_in, j, i) = Mx(:);
+            Xc2(:, :, 1, j, i) = Mw';
             Xs2(:,:,j,i) = Mw';
 
 
@@ -96,8 +96,8 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
             
                 Mx = reshape( Mw', [m_in,1] );
                 X2(1:m_in, j, i) = Mx(:);
-                Xc2(1:m_in, 1, 1, j, i) = Mx(:);
                 Xr2(1:m_in, j, i) = Mx(:);
+                Xc2(:, :, 1, j, i) = Mw';
                 Xs2(:,:,j,i) = Mw';
              end
         end

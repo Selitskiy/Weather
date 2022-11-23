@@ -10,7 +10,7 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
     % Re-format input into session tensor
     % ('ones' (not 'zeros') for X are for bias 'trick'
     X = zeros([m_in, k_ob, n_sess]);
-    Xc = zeros([m_in, 1, 1, k_ob, n_sess]);
+    Xc = zeros([x_in, t_in, 1, k_ob, n_sess]);
     Xr = ones([m_in+1, k_ob, n_sess]);
     Xs = zeros([x_in, t_in, k_ob, n_sess]);
     Ys = zeros([y_out, t_out, k_ob, n_sess]);
@@ -51,8 +51,8 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
 
             Mx = reshape( Mxw', [m_in,1] );
             X(1:m_in, j, i) = Mx(:);
-            Xc(1:m_in, 1, 1, j, i) = Mx(:);
             Xr(1:m_in, j, i) = Mx(:);
+            Xc(:, :, 1, j, i) = Mxw';
             Xs(:,:,j,i) = Mxw';
 
 
@@ -136,8 +136,8 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
 
                 Mx = reshape( Mxw', [m_in,1] );
                 X(1:m_in, j, i) = Mx(:);
-                Xc(1:m_in, 1, 1, j, i) = Mx(:);
                 Xr(1:m_in, j, i) = Mx(:);
+                Xc(:, :, 1, j, i) = Mxw';
                 Xs(:,:,j,i) = Mxw';
                 
 

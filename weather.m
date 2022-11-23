@@ -21,11 +21,11 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 
 
 % input dimesion (parms x days)
-x_off = 10;
-x_in = 3;
+%x_off = 10;
+%x_in = 3;
 
-%x_off = 0;
-%x_in = 13;
+x_off = 0;
+x_in = 13;
 
 %x_off = 0;
 %x_in = 10;
@@ -46,7 +46,7 @@ l_whole = l_whole_ex - t_out;
 % Break the whole dataset in training sessions,
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
-l_sess = 12*t_in + t_out + t_in;
+l_sess = 12*t_in + t_out + t_in; %12*t_in + t_out + t_in;
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -80,8 +80,10 @@ for i = 1:n_sess
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = CnnSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = AnnNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
