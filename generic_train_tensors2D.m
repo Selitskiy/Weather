@@ -1,11 +1,13 @@
-function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo)
+function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, Vit, Xp, Xcp, Xrp, Xsp] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo, x_pca)
 
     % Number of observations in a session
     k_ob = l_sess - t_in + 1 - t_in - t_out;
 
     m_in = x_in * t_in;
     n_out = y_out * t_out;
-    n_in = y_out * t_in;
+    %n_in = y_out * t_in;
+
+    m_pca = x_pca * t_in;
 
     % Re-format input into session tensor
     % ('ones' (not 'zeros') for X are for bias 'trick'
@@ -28,10 +30,22 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
     %Sys = zeros([2, k_ob, n_sess]);
     Sy = zeros([2, k_ob, n_sess]);
 
+    %PCA
+    V = zeros([x_in, x_in, n_sess]);
+    Vi = zeros([x_in, x_in, n_sess]);
+    Vit = zeros([x_pca, x_in, n_sess]);
+    It = zeros([x_in, n_sess]);
+
+    Xp  = zeros([m_pca, k_ob, n_sess]);
+    Xcp = zeros([x_pca, t_in, 1, k_ob, n_sess]);
+    Xrp = ones([m_pca+1, k_ob, n_sess]);
+    Xsp = zeros([x_pca, t_in, k_ob, n_sess]);
+
 
     k_iob = k_ob * n_sess;
     XI = zeros([m_in, k_iob]);
     I = zeros([k_iob, 1]);
+
 
     for i = 1:n_sess
         for j = 1:k_ob
@@ -103,10 +117,19 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
         [Bi(1,:,i), Bi(2,:,i)] = bounds(Mxw,1);
         Bi(3,:,i) = mean(Mxw,1);
         Bi(4,:,i) = std(Mxw,0,1);
+
+
+        %PCA
+        if norm_fli
+            MeanSessi = Bi(3,:,i);
+            StdSessi = Bi(4,:,i);
+            Mxw = generic_mean_std_scale2D(Mxw, MeanSessi, StdSessi);
+        end
+        [~, Vit(:,:,i), Vi(:,:,i), V(:,:,i), It(:,i)] = pca_create(Mxw', x_pca, 0);
          
 
-        %Normalize input and output on the same training-only interval
-        %separately for inpout and label-output
+        %%Normalize input and output on the same training-only interval
+        %%separately for inpout and label-output
         %st_idx = idx+1+t_in;
         %%end_idx = idx+k_ob+t_in+t_out-1;
         %end_idx = idx+k_ob+t_out-1;
@@ -139,11 +162,36 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = generic_train_ten
                 Xr(1:m_in, j, i) = Mx(:);
                 Xc(:, :, 1, j, i) = Mxw';
                 Xs(:,:,j,i) = Mxw';
-                
+
+
+                %PCA
+                Mxwp = pca_map(Mxw', Vit(:,:,i));
+                Mxp = reshape( Mxwp, [m_pca,1] );
+                Xp(1:m_pca, j, i) = Mxp;
+                Xrp(1:m_pca, j, i) = Mxp;
+                Xcp(:, :, 1, j, i) = Mxwp;
+                Xsp(:,:,j,i) = Mxwp;
+
 
                 i_idx = (i-1)*k_ob + j;
                 XI(1:m_in, i_idx) = Mx(:);
                 I(i_idx) = i;
+            end
+        else
+            for j = 1:k_ob
+                % extract and scale observation sequence
+                idx = (i-1)*l_sess + j;
+            
+                Mxw = M(idx:idx+t_in-1, x_off+1:x_off+x_in);
+
+                %PCA
+                Mxwp = pca_map(Mxw', Vit(:,:,i));
+                Mxp = reshape( Mxwp, [m_pca,1] );
+                Xp(1:m_pca, j, i) = Mxp;
+                Xrp(1:m_pca, j, i) = Mxp;
+                Xcp(:, :, 1, j, i) = Mxwp;
+                Xsp(:,:,j,i) = Mxwp;
+
             end
         end
 

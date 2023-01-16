@@ -1,4 +1,4 @@
-function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = generic_test_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob)
+function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob, Xp2, Xcp2, Xrp2, Xsp2] = generic_test_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob, x_pca, Vit)
     %% Test regression ANN
     if(k_tob == 0)
         [m,~] = size(M);
@@ -11,6 +11,11 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
     m_in = x_in * t_in;
     n_out = y_out * t_out;
     %n_in = y_out * t_in;
+
+    m_pca = m_in;
+    if x_pca
+        m_pca = x_pca * t_in;
+    end
 
     X2 = zeros([m_in, k_tob, t_sess-sess_off]);
     Xc2 = zeros([x_in, t_out, 1, k_tob, t_sess-sess_off]);
@@ -29,6 +34,13 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
     %Segment boundaries
     Sx2 = zeros([2, k_tob, t_sess-sess_off]);
     Sy2 = zeros([2, k_tob, t_sess-sess_off]);
+
+
+    %PCA
+    Xp2 = zeros([m_pca, k_tob, t_sess-sess_off]);
+    Xcp2 = zeros([x_pca, t_out, 1, k_tob, t_sess-sess_off]);
+    Xrp2 = ones([m_pca+1, k_tob, t_sess-sess_off]);
+    Xsp2 = zeros([x_pca, t_in, k_tob, t_sess-sess_off]);
 
 
     % Re-format test input into session tensor
@@ -99,6 +111,36 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
                 Xr2(1:m_in, j, i) = Mx(:);
                 Xc2(:, :, 1, j, i) = Mw';
                 Xs2(:,:,j,i) = Mw';
+
+
+                %PCA
+                if Vit
+                    Mxwp = pca_map(Mw', Vit(:,:,i));
+                    Mxp = reshape( Mxwp, [m_pca,1] );
+                    Xp2(1:m_pca, j, i) = Mxp;
+                    Xrp2(1:m_pca, j, i) = Mxp;
+                    Xcp2(:, :, 1, j, i) = Mxwp;
+                    Xsp2(:,:,j,i) = Mxwp;
+                end
+                
+             end
+        else
+            for j = 1:k_tob
+                % extract and scale observation sequence
+                idx = (i+sess_off)*l_sess + (j-1)*t_out + 1 + offset - t_in;
+
+                Mw = M(idx:idx+t_in-1, x_off+1:x_off+x_in);
+
+                %PCA
+                if Vit
+                    Mxwp = pca_map(Mw', Vit(:,:,i));
+                    Mxp = reshape( Mxwp, [m_pca,1] );
+                    Xp2(1:m_pca, j, i) = Mxp;
+                    Xrp2(1:m_pca, j, i) = Mxp;
+                    Xcp2(:, :, 1, j, i) = Mxwp;
+                    Xsp2(:,:,j,i) = Mxwp;
+                end
+
              end
         end
         

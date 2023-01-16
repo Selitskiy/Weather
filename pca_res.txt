@@ -1,0 +1,24 @@
+relu2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.010524+-0.004914 MeanMaxAPErr 0.113527+-0.054524
+relu2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.233379+-1.065465 MeanMaxRSErr 1.065465+-0.541098
+relu2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 1.181372+-1.019118 MeanMaxRSErr 1.019118+-0.58021
+
+relupca2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.010110+-0.004827 MeanMaxAPErr 0.112174+-0.052645
+relupca2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.209319+-1.045192 MeanMaxRSErr 1.045192+-0.544487
+relupca2d, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 1.211034+-1.036917 MeanMaxRSErr 1.036917+-0.613438
+
+
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.010798+-0.004897 MeanMaxAPErr 0.123093+-0.060170
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.318343+-1.163873 MeanMaxRSErr 1.163873+-0.591524
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1440, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 0.649207+-0.934006 MeanMaxRSErr 0.934006+-0.590600
+
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1872, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.010801+-0.004770 MeanMaxAPErr 0.105741+-0.049379
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1872, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.301363+-1.157219 MeanMaxRSErr 1.157219+-0.530215
+lstm2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1872, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 0.631902+-0.968525 MeanMaxRSErr 0.968525+-0.441228
+
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.011110+-0.005092 MeanMaxAPErr 0.124746+-0.059766
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.358069+-1.189031 MeanMaxRSErr 1.189031+-0.627789
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:720, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 0.588071+-0.869177 MeanMaxRSErr 0.869177+-0.496643
+
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1152, N_out:432, Tr_sess:7, Ts_sess:7, MAPErr: 0.010890+-0.004785 MeanMaxAPErr 0.126189+-0.055397
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1152, N_out:432, Tr_sess:7, Ts_sess:7, RMSErr: 1.319814+-1.168798 MeanMaxRSErr 1.168798+-0.570795
+lstmpca2dval, dataFN measurements_July-October2022_cleared.xlsx, NormFi:1, M_in:1152, N_out:432, Tr_sess:7, Ts_sess:7, Cont RMSErr: 0.549681+-0.817405 MeanMaxRSErr 0.817405+-0.414170

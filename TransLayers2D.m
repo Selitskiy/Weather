@@ -17,6 +17,7 @@ classdef TransLayers2D
                 additionLayer(2,'Name','fcAgate2')
                 fullyConnectedLayer(net.k_hid2,'Name','fcHidden2')
                 fullyConnectedLayer(net.n_out,'Name','fcOut')
+                
                 regressionLayer('Name','regOut')
             ];
             cgraph = layerGraph(oLayers);

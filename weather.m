@@ -3,10 +3,10 @@ clearvars -global;
 clear all; close all; clc;
 
 % Mem cleanup
-ngpu = gpuDeviceCount();
-for i=1:ngpu
-    reset(gpuDevice(i));
-end
+%ngpu = gpuDeviceCount();
+%for i=1:ngpu
+%    reset(gpuDevice(i));
+%end
 
 %% Load data
 %dataFile = 'measurements_July2022_cleared.xlsx';
@@ -24,11 +24,11 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 %x_off = 10;
 %x_in = 3;
 
-x_off = 0;
-x_in = 13;
-
 %x_off = 0;
-%x_in = 10;
+%x_in = 13;
+
+x_off = 0;
+x_in = 10;
 t_in = 144;
 
 % output dimensions (parms x days)
@@ -61,7 +61,9 @@ end
 
 
 ini_rate = 0.001; 
-max_epoch = 100;
+max_epoch = 200; %mlp 2000;%100;
+%max_epoch = 20; %rnn
+
 norm_fli = 1;
 norm_flo = 1;
 
@@ -73,17 +75,28 @@ for i = 1:n_sess
 
     %regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+
+    %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = SeqCnnSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = SeqCnnSpecTNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = CnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    regNet = CnnSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnGruNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnGruSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = CnnSpec2Net2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    
     %regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = GruVal3Net2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = LinRegNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = AnnNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
@@ -98,11 +111,26 @@ for i = 1:n_sess
     %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
+
+    %regNet = ReluNetPca2D(x_off, x_in, t_in, y_off, y_out, t_out, 5, 0, ini_rate, max_epoch);
+
+    %regNet = LstmValNetPca2D(x_off, x_in, t_in, y_off, y_out, t_out, 5, 0, ini_rate, max_epoch);
+
     modelName = regNet.name;
 
     [regNet, X, Y, Bi, Bo, Sx, Sy, k_ob] = regNet.TrainTensors(M, l_sess, n_sess, norm_fli, norm_flo);
 
+
+    % GPU on
+    gpuDevice(1);
+    reset(gpuDevice(1));
+    
     regNet = regNet.Train(i, X, Y);
+
+    % GPU off
+    delete(gcp('nocreate'));
+    gpuDevice([]);
+
 
     regNets{i} = regNet;
 
@@ -130,7 +158,16 @@ k_tob = 0;
 [X2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob] = regNets{1}.TestTensors(M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob);
 
 %% test
+
+% GPU on
+gpuDevice(1);
+reset(gpuDevice(1));
+    
 [X2, Y2] = regNets{1}.Predict(X2, Y2, regNets, t_sess, sess_off, k_tob);
+
+% GPU off
+delete(gcp('nocreate'));
+gpuDevice([]);
 
 %% re-scale in observation bounds
 %if(norm_fli)
@@ -152,6 +189,9 @@ fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MA
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
 
 
+[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Y2, Yh2); 
+
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, mean(ma_errC), std(ma_errC));
 
 %%
 regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName);
@@ -159,31 +199,3 @@ regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_s
 %%
 %regNets{1}.TestIn_graph(M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName);
 
-
-% PCA for training
-
-% No normalization
-%X1n = Xt;
-% Normalize each image chanell (variable or dimension) across image set (horizontal)
-%[X1n,PS] = mapstd(Xt);
-
-C = cov( X1n' );
-[V, ~, ~] = eig(C);
-Vn1 = flipud(inv(V));    
-X1pe = Vn1 * X1n;
-
-% Remove minor components with normalized var < thresh
-Expl = var(X1pe, 0, 2)/sum(var(X1pe, 0, 2))*100;
-It = Expl >= thresh;
-Vn1t = Vn1(It, :);
-X1pet = X1pe(It, :);
-Xt = X1pet;
-
-% PCA for validation
-
-% No normalization
-%X2n = Xv;
-% Map test set into transformations generated by the training set (PS, Vn1t)
-X2n = mapstd('apply',Xv,PS);
-X2pet = Vn1t * X2n;
-Xv = X2pet;
