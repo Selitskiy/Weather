@@ -1,4 +1,4 @@
-function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, Vit, Xp, Xcp, Xrp, Xsp] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo, x_pca)
+function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, Vit, Xp, Xcp, Xrp, Xsp, PcaSc] = generic_train_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, n_sess, norm_fli, norm_flo, x_pca)
 
     % Number of observations in a session
     k_ob = l_sess - t_in + 1 - t_in - t_out;
@@ -35,6 +35,7 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, Vit, Xp, Xcp, Xrp, 
     Vi = zeros([x_in, x_in, n_sess]);
     Vit = zeros([x_pca, x_in, n_sess]);
     It = zeros([x_in, n_sess]);
+    PcaSc = zeros([x_in, n_sess]);
 
     Xp  = zeros([m_pca, k_ob, n_sess]);
     Xcp = zeros([x_pca, t_in, 1, k_ob, n_sess]);
@@ -125,7 +126,7 @@ function [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, Vit, Xp, Xcp, Xrp, 
             StdSessi = Bi(4,:,i);
             Mxw = generic_mean_std_scale2D(Mxw, MeanSessi, StdSessi);
         end
-        [~, Vit(:,:,i), Vi(:,:,i), V(:,:,i), It(:,i)] = pca_create(Mxw', x_pca, 0);
+        [~, Vit(:,:,i), Vi(:,:,i), V(:,:,i), It(:,i), PcaSc(:,i)] = pca_create(Mxw', x_pca, 0);
          
 
         %%Normalize input and output on the same training-only interval

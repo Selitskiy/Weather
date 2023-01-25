@@ -4,6 +4,7 @@ classdef MLPInputNetPca2D < MLPInputNet2D
         Vit = [];
         Vi = [];
         V = [];
+        PcaSc = [];
         x_pca = 0;
         m_pca = 0;
     end
@@ -19,7 +20,7 @@ classdef MLPInputNetPca2D < MLPInputNet2D
 
 
         function [net, Xp, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
-            [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, net.Vit, Xp, Xcp, Xrp, Xsp] = generic_train_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, l_sess, n_sess, norm_fli, norm_flo, net.x_pca);
+            [X, Xc, Xr, Xs, Ys, Y, Bi, Bo, XI, C, Sx, Sy, k_ob, net.Vit, Xp, Xcp, Xrp, Xsp, net.PcaSc] = generic_train_tensors2D(M, net.x_off, net.x_in, net.t_in, net.y_off, net.y_out, net.t_out, l_sess, n_sess, norm_fli, norm_flo, net.x_pca);
             net.mb_size = 2^floor(log2(k_ob)-4);
 
             %[net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors@MLPInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);

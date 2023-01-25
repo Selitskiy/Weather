@@ -1,4 +1,4 @@
-function [Xet, Vit, Vi, V, It] = pca_create(X, nThresh, vThresh)
+function [Xet, Vit, Vi, V, It, PcaSc] = pca_create(X, nThresh, vThresh)
 
     C = cov( X' );
     [V, ~, ~] = eig(C);
@@ -21,5 +21,7 @@ function [Xet, Vit, Vi, V, It] = pca_create(X, nThresh, vThresh)
     Vit = Vi(It, :);
     Xet = Xe(It, :);
 
+    PcaSc = sum(abs(Vi .* Expl), 1);
+    PcaSc = PcaSc / sum(PcaSc, 2);
 
 end

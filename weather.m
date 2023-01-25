@@ -24,11 +24,11 @@ M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 %x_off = 10;
 %x_in = 3;
 
-%x_off = 0;
-%x_in = 13;
-
 x_off = 0;
-x_in = 10;
+x_in = 13;
+
+%x_off = 0;
+%x_in = 10;
 t_in = 144;
 
 % output dimensions (parms x days)
@@ -61,8 +61,8 @@ end
 
 
 ini_rate = 0.001; 
-max_epoch = 200; %mlp 2000;%100;
-%max_epoch = 20; %rnn
+%max_epoch = 200; %mlp 2000;%100;
+max_epoch = 20; %rnn
 
 norm_fli = 1;
 norm_flo = 1;
@@ -75,7 +75,7 @@ for i = 1:n_sess
 
     %regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -112,7 +112,7 @@ for i = 1:n_sess
     %regNet = GruNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
 
-    %regNet = ReluNetPca2D(x_off, x_in, t_in, y_off, y_out, t_out, 5, 0, ini_rate, max_epoch);
+    regNet = ReluNetPca2D(x_off, x_in, t_in, y_off, y_out, t_out, 5, 0, ini_rate, max_epoch);
 
     %regNet = LstmValNetPca2D(x_off, x_in, t_in, y_off, y_out, t_out, 5, 0, ini_rate, max_epoch);
 
