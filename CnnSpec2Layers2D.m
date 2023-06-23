@@ -1,11 +1,11 @@
-classdef CnnSpecLayers2D
+classdef CnnSpec2Layers2D
 
     properties
 
     end
 
     methods
-        function net = CnnSpecLayers2D()            
+        function net = CnnSpec2Layers2D()            
         end
 
 
@@ -20,7 +20,10 @@ classdef CnnSpecLayers2D
             alayers = [
                 imageInputLayer([net.x_in net.t_in 1],'Normalization','none','Name','Input')
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1a')
-                %flattenLayer('Name','Flata')
+                flattenLayer('Name','Flata')
+                fullyConnectedLayer(net.n_out,'Name','Fulla')
+                tanhLayer('Name','Tanha')
+                gruLayer(net.k_hid1,'Name','Gru1a')
             ];
 
             net.lGraph = layerGraph(alayers);
@@ -30,7 +33,10 @@ classdef CnnSpecLayers2D
 
             blayers = [
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1b')
-                %flattenLayer('Name','Flatb')
+                flattenLayer('Name','Flatb')
+                fullyConnectedLayer(net.n_out,'Name','Fullb')
+                tanhLayer('Name','Tanhb')
+                gruLayer(net.k_hid1,'Name','Gru1b')
             ];
 
             net.lGraph = addLayers(net.lGraph, blayers);
@@ -41,7 +47,10 @@ classdef CnnSpecLayers2D
 
             clayers = [
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1c')
-                %flattenLayer('Name','Flatb')
+                flattenLayer('Name','Flatc')
+                fullyConnectedLayer(net.n_out,'Name','Fullc')
+                tanhLayer('Name','Tanhc')
+                gruLayer(net.k_hid1,'Name','Gru1c')
             ];
 
             net.lGraph = addLayers(net.lGraph, clayers);
@@ -52,7 +61,10 @@ classdef CnnSpecLayers2D
 
             dlayers = [
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1d')
-                %flattenLayer('Name','Flatb')
+                flattenLayer('Name','Flatd')
+                fullyConnectedLayer(net.n_out,'Name','Fulld')
+                tanhLayer('Name','Tanhd')
+                gruLayer(net.k_hid1,'Name','Gru1d')
             ];
 
             net.lGraph = addLayers(net.lGraph, dlayers);
@@ -63,7 +75,10 @@ classdef CnnSpecLayers2D
 
             elayers = [
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1e')
-                %flattenLayer('Name','Flatb')
+                flattenLayer('Name','Flate')
+                fullyConnectedLayer(net.n_out,'Name','Fulle')
+                tanhLayer('Name','Tanhe')
+                gruLayer(net.k_hid1,'Name','Gru1e')
             ];
 
             net.lGraph = addLayers(net.lGraph, elayers);
@@ -72,34 +87,35 @@ classdef CnnSpecLayers2D
 
 
             f_h = 3;
+            f_n = 1; 
             cl_n = 5;
-            f_n2 = 16;
 
             s2Layers = [
-                %depthConcatenationLayer(cl_n, 'Name', 'Concat')
+                %additionLayer(cl_n,'Name','Add')
+                %%depthConcatenationLayer(cl_n, 'Name', 'Concat')
                 concatenationLayer(1, cl_n, 'Name', 'Concat')
-                convolution2dLayer([cl_n*f_n f_h], f_n2, 'Stride',[cl_n*f_n f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv2')
-                %sequenceUnfoldingLayer('Name','Unfold')
-                flattenLayer('Name','FlatN')
                 fullyConnectedLayer(net.n_out,'Name','FullN') %t_in
                 tanhLayer('Name','TanhN')
-                %concatenationLayer(1, 2, 'Name', 'Concat')
-                gruLayer(net.k_hid1,'Name','Gru1')
-                %fullyConnectedLayer(net.k_hid1,'Name','Full1')
-                %reluLayer('Name','Relu1')
+                %convolution2dLayer([cl_n f_h], f_n, 'Stride',[cl_n f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv2')
+                %%sequenceUnfoldingLayer('Name','Unfold')
+                %flattenLayer('Name','Flat2')
+                %%concatenationLayer(1, 2, 'Name', 'Concat')
+                %gruLayer(net.k_hid1,'Name','Gru1')
+                %%fullyConnectedLayer(net.k_hid1,'Name','Full1')
+                %%reluLayer('Name','Relu1')
                 gruLayer(net.k_hid2,'Name','Gru2')
-                %fullyConnectedLayer(net.k_hid2,'Name','Full2')
-                %reluLayer('Name','Relu2')
+                %%fullyConnectedLayer(net.k_hid2,'Name','Full2')
+                %%reluLayer('Name','Relu2')
                 fullyConnectedLayer(net.n_out,'Name','FullC')
                 regressionLayer
             ];
             net.lGraph = addLayers(net.lGraph, s2Layers);
 
-            net.lGraph = connectLayers(net.lGraph, 'Conv1a', 'Concat/in1');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1b', 'Concat/in2');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1c', 'Concat/in3');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1d', 'Concat/in4');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1e', 'Concat/in5');
+            net.lGraph = connectLayers(net.lGraph, 'Gru1a', 'Concat/in1');
+            net.lGraph = connectLayers(net.lGraph, 'Gru1b', 'Concat/in2');
+            net.lGraph = connectLayers(net.lGraph, 'Gru1c', 'Concat/in3');
+            net.lGraph = connectLayers(net.lGraph, 'Gru1d', 'Concat/in4');
+            net.lGraph = connectLayers(net.lGraph, 'Gru1e', 'Concat/in5');
 
 
             net.options = trainingOptions('adam', ...

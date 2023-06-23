@@ -4,8 +4,23 @@ function [E2f, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, s
     %E2f = ((Y2(end-y_out+1:end, 1:t_out, :, :) - Yh2(end-y_out+1:end, 1:t_out, :, :))).^2;
     [skn, skf, sjf, sif] = size(E2f);
 
+    %Remove NaNs
+    nn = 0;
+    for n = 1:skn
+    for k = 1:skf
+        for j = 1:sjf
+            for i = 1:sif
+                if isnan(E2f(n,k,j,i))
+                    E2f(n,k,j,i) = 0;
+                    nn = nn + 1;
+                end
+            end
+        end
+    end
+    end
+
     S2 = sum(E2f, [2, 3, 4]);
-    Sn2 = skf*sjf*sif;
+    Sn2 = skf*sjf*sif - nn;
     
     S2 = sum(sqrt(S2/Sn2), 1)/skn;
 

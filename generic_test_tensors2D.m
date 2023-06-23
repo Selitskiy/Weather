@@ -1,4 +1,4 @@
-function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2, k_tob, Xp2, Xcp2, Xrp2, Xsp2] = generic_test_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob, x_pca, Vit)
+function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, XI2, Sx2, Sy2, k_tob, Xp2, Xcp2, Xrp2, Xsp2] = generic_test_tensors2D(M, x_off, x_in, t_in, y_off, y_out, t_out, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob, x_pca, Vit)
     %% Test regression ANN
     if(k_tob == 0)
         [m,~] = size(M);
@@ -41,6 +41,10 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
     Xcp2 = zeros([x_pca, t_out, 1, k_tob, t_sess-sess_off]);
     Xrp2 = ones([m_pca+1, k_tob, t_sess-sess_off]);
     Xsp2 = zeros([x_pca, t_in, k_tob, t_sess-sess_off]);
+
+
+    k_iob = k_tob * (t_sess-sess_off);
+    XI2 = zeros([m_in, k_iob]);
 
 
     % Re-format test input into session tensor
@@ -88,6 +92,10 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
 
             Ysh2(:,:, j, i) = Myw';
             Yshs2(:,:, j, i) = Myw';
+
+
+            i_idx = (i-1)*k_tob + j;
+            XI2(1:m_in, i_idx) = Mx(:);
         end
 
         if(norm_fli)
@@ -122,6 +130,9 @@ function [X2, Xc2, Xr2, Xs2, Ys2, Ysh2, Yshs2, Y2, Yh2, Yhs2, Bti, Bto, Sx2, Sy2
                     Xcp2(:, :, 1, j, i) = Mxwp;
                     Xsp2(:,:,j,i) = Mxwp;
                 end
+
+                i_idx = (i-1)*k_tob + j;
+                XI2(1:m_in, i_idx) = Mx(:);
                 
              end
         else

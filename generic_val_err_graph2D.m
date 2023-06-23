@@ -1,4 +1,4 @@
-function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in, y_off, y_out, t_out, n_xy, k_tob, t_sess, sess_off, offset, k_start, modelName)
+function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_in, t_in, y_off, y_out, t_out, k_tob, t_sess, sess_off, offset, k_start, modelName, ylab)
     
     legItems = strings(0);
 
@@ -44,7 +44,7 @@ function generic_val_err_graph2D(M, Em, Er, l_m, Y2, Sy2, l_y, l_sess, x_off, x_
 
     title(strcat("Model ",modelName))
     xlabel('Observations')
-    ylabel('Moistrure %')
+    ylabel(ylab)
     legend(legItems)
 
 

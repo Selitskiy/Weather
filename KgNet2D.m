@@ -5,9 +5,9 @@ classdef KgNet2D < BaseNet2D & MLPInputNet2D
     end
 
     methods
-        function net = KgNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch)
+        function net = KgNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
-            net = net@BaseNet2D(x_in, t_in, y_out, t_out, ini_rate, max_epoch);
+            net = net@BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
             net.name = "kgate2d";
@@ -96,7 +96,7 @@ classdef KgNet2D < BaseNet2D & MLPInputNet2D
             net.lGraph = cgraph;
 
             net.options = trainingOptions('adam', ...
-                'ExecutionEnvironment','parallel',...
+                'ExecutionEnvironment','auto',...
                 'Shuffle', 'every-epoch',...
                 'MiniBatchSize', net.mb_size, ...
                 'InitialLearnRate', net.ini_rate, ...

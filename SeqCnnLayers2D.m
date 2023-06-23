@@ -1,11 +1,11 @@
-classdef CnnLayers2D
+classdef SeqCnnLayers2D
 
     properties
 
     end
 
     methods
-        function net = CnnLayers2D()            
+        function net = SeqCnnLayers2D()            
         end
 
 
@@ -18,8 +18,8 @@ classdef CnnLayers2D
             p_s = 1;
     
             alayers = [
-                imageInputLayer([net.x_in net.t_in 1],'Normalization','none','Name','Input')
-                %sequenceInputLayer([net.x_in net.t_in 1],'Normalization','none','Name','Input')
+                %imageInputLayer([net.x_in net.t_in 1],'Normalization','none','Name','Input')
+                sequenceInputLayer([net.x_in net.t_in 1],'Normalization','none','Name','Input')
                 convolution2dLayer([net.x_in f_h], f_n, 'Stride',[net.x_in f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv1a')
                 %flattenLayer('Name','Flata')
             ];

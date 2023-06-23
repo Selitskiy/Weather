@@ -1,17 +1,17 @@
-classdef CnnSpecLayers2D
+classdef CnnGruSpecLayers2D
 
     properties
 
     end
 
     methods
-        function net = CnnSpecLayers2D()            
+        function net = CnnGruSpecLayers2D()            
         end
 
 
         function net = Create(net)
 
-            %c_in = 1;
+
             f_h = 5; 
             f_n = 16; 
             f_s = 1;
@@ -72,34 +72,76 @@ classdef CnnSpecLayers2D
 
 
             f_h = 3;
+            f_n = 16; 
             cl_n = 5;
-            f_n2 = 16;
 
             s2Layers = [
                 %depthConcatenationLayer(cl_n, 'Name', 'Concat')
-                concatenationLayer(1, cl_n, 'Name', 'Concat')
-                convolution2dLayer([cl_n*f_n f_h], f_n2, 'Stride',[cl_n*f_n f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv2')
+                concatenationLayer(1, cl_n, 'Name', 'ConcatC')
+                convolution2dLayer([cl_n f_h], f_n, 'Stride',[cl_n f_s], 'DilationFactor',[1 p_s], 'Padding','same', 'PaddingValue','replicate', 'Name','Conv2')
                 %sequenceUnfoldingLayer('Name','Unfold')
                 flattenLayer('Name','FlatN')
-                fullyConnectedLayer(net.n_out,'Name','FullN') %t_in
-                tanhLayer('Name','TanhN')
-                %concatenationLayer(1, 2, 'Name', 'Concat')
-                gruLayer(net.k_hid1,'Name','Gru1')
-                %fullyConnectedLayer(net.k_hid1,'Name','Full1')
-                %reluLayer('Name','Relu1')
-                gruLayer(net.k_hid2,'Name','Gru2')
-                %fullyConnectedLayer(net.k_hid2,'Name','Full2')
-                %reluLayer('Name','Relu2')
-                fullyConnectedLayer(net.n_out,'Name','FullC')
-                regressionLayer
             ];
             net.lGraph = addLayers(net.lGraph, s2Layers);
 
-            net.lGraph = connectLayers(net.lGraph, 'Conv1a', 'Concat/in1');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1b', 'Concat/in2');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1c', 'Concat/in3');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1d', 'Concat/in4');
-            net.lGraph = connectLayers(net.lGraph, 'Conv1e', 'Concat/in5');
+            net.lGraph = connectLayers(net.lGraph, 'Conv1a', 'ConcatC/in1');
+            net.lGraph = connectLayers(net.lGraph, 'Conv1b', 'ConcatC/in2');
+            net.lGraph = connectLayers(net.lGraph, 'Conv1c', 'ConcatC/in3');
+            net.lGraph = connectLayers(net.lGraph, 'Conv1d', 'ConcatC/in4');
+            net.lGraph = connectLayers(net.lGraph, 'Conv1e', 'ConcatC/in5');
+
+
+            g1layers = [
+                fullyConnectedLayer(net.t_in,'Name','FullN1')
+                %tanhLayer('Name','TanhN1')
+                gruLayer(net.k_hid1,'Name','Gru11')
+                %fullyConnectedLayer(net.k_hid1,'Name','Full1')
+                %reluLayer('Name','Relu1')
+                gruLayer(net.k_hid2,'Name','Gru12')
+                %fullyConnectedLayer(net.k_hid2,'Name','Full2')
+                %reluLayer('Name','Relu2')
+            ];
+            net.lGraph = addLayers(net.lGraph, g1layers);
+            net.lGraph = connectLayers(net.lGraph, 'FlatN', 'FullN1');
+
+
+             g2layers = [
+                fullyConnectedLayer(net.t_in,'Name','FullN2')
+                %tanhLayer('Name','TanhN1')
+                gruLayer(net.k_hid1,'Name','Gru21')
+                %fullyConnectedLayer(net.k_hid1,'Name','Full1')
+                %reluLayer('Name','Relu1')
+                gruLayer(net.k_hid2,'Name','Gru22')
+                %fullyConnectedLayer(net.k_hid2,'Name','Full2')
+                %reluLayer('Name','Relu2')
+            ];
+            net.lGraph = addLayers(net.lGraph, g2layers);
+            net.lGraph = connectLayers(net.lGraph, 'FlatN', 'FullN2');           
+
+             g3layers = [
+                fullyConnectedLayer(net.t_in,'Name','FullN3')
+                %tanhLayer('Name','TanhN1')
+                gruLayer(net.k_hid1,'Name','Gru31')
+                %fullyConnectedLayer(net.k_hid1,'Name','Full1')
+                %reluLayer('Name','Relu1')
+                gruLayer(net.k_hid2,'Name','Gru32')
+                %fullyConnectedLayer(net.k_hid2,'Name','Full2')
+                %reluLayer('Name','Relu2')
+            ];
+            net.lGraph = addLayers(net.lGraph, g3layers);
+            net.lGraph = connectLayers(net.lGraph, 'FlatN', 'FullN3');  
+
+
+            rlayers = [
+                concatenationLayer(1, net.y_out, 'Name', 'ConcatG')
+                fullyConnectedLayer(net.n_out,'Name','FullC')
+                regressionLayer
+            ];
+            net.lGraph = addLayers(net.lGraph, rlayers);
+
+            net.lGraph = connectLayers(net.lGraph, 'Gru12', 'ConcatG/in1');
+            net.lGraph = connectLayers(net.lGraph, 'Gru22', 'ConcatG/in2');
+            net.lGraph = connectLayers(net.lGraph, 'Gru32', 'ConcatG/in3');
 
 
             net.options = trainingOptions('adam', ...

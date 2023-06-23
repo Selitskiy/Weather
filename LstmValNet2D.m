@@ -16,9 +16,9 @@ classdef LstmValNet2D < LstmValLayers2D & RNNValBaseNet2D & RNNValInputNet2D
         end
 
 
-        function [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
+        function [net, X, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
 
-            [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors@RNNValInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
+            [net, X, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = TrainTensors@RNNValInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
 
             net = Create(net);
 
