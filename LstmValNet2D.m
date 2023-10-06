@@ -7,9 +7,9 @@ classdef LstmValNet2D < LstmValLayers2D & RNNValBaseNet2D & RNNValInputNet2D
     methods
         function net = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
-            net = net@LstmValLayers2D();
             net = net@RNNValBaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@RNNValInputNet2D();
+            net = net@LstmValLayers2D();
 
             net.name = "lstm2dval";
 

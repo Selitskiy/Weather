@@ -2,6 +2,8 @@
 clearvars -global;
 clear all; close all; clc;
 
+addpath('~/ANNLib/');
+
 % Mem cleanup
 %ngpu = gpuDeviceCount();
 %for i=1:ngpu
@@ -51,11 +53,11 @@ dataDir = '~/data/Weather_data';
 %dataFile = 'Measurements 04_2022-04_2023 Scenario1.xlsx';
 %yLab = 'Soil Moisture (%)';
 %Scenario 2
-%dataFile = 'Measurements 04_2022-04_2023 Scenario2.xlsx';
-%yLab = 'ORP Smooth_mV';
+dataFile = 'Measurements 04_2022-04_2023 Scenario2.xlsx';
+yLab = 'ORP Smooth_mV';
 %Scenario 3
-dataFile = 'Measurements 04_2022-04_2023 Scenario3.xlsx';
-yLab = 'Water EC (muS/cm)';
+%dataFile = 'Measurements 04_2022-04_2023 Scenario3.xlsx';
+%yLab = 'Water EC (muS/cm)';
 %Scenario 4
 %dataFile = 'Measurements 04_2022-04_2023 Scenario4.xlsx';
 %yLab = 'PH Smooth';
@@ -64,11 +66,15 @@ dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
 d_mult = 3;
+d_div = 24; %experiment
+part_mult = 1;
+%part_mult = 5; %15 days
 
 M_off = 1;
 %Dilation
-M_div = 1;
+%M_div = 1;
 %M_div = 14/d_mult; %2 weeks;
+M_div = d_div; %experiment
 
 Mt = readmatrix(dataFullName);
 
@@ -84,7 +90,8 @@ M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
 x_off = 0;
 x_in = 13;
 
-t_in = 144*d_mult;
+%t_in = 144*d_mult;
+t_in = floor(144/d_div*d_mult); %experiment
 
 % output dimensions (parms x days)
 % Scenario 2-4
@@ -95,9 +102,12 @@ y_out = 1;
 %y_off = 10;
 %y_out = 3;
 
-t_out = 144*d_mult;
+%t_out = 144*d_mult;
+t_out = floor(144/d_div*d_mult); %experiment
 
-ts_out = 36*d_mult; 
+
+%ts_out = 36*d_mult; 
+ts_out = floor(36/d_div*d_mult); %experiment
 
 l_whole = l_whole_ex;
 % Leave space for last full label
@@ -109,7 +119,7 @@ l_whole = l_whole_ex;
 % Break the whole dataset in training sessions,
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
-l_sess = floor(12/d_mult)*t_in + t_out + t_in; %12*t_in + t_out + t_in;
+l_sess = floor(12/d_mult*part_mult)*t_in + t_out + t_in; %12*t_in + t_out + t_in;
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -138,11 +148,13 @@ end
 
 
 ini_rate = 0.001; 
-%max_epoch = 2000; %mlp 2000;%200;
-max_epoch = 20; %200; %rnn seq %20; %rnn vect
+max_epoch = 400; %500; %mlp 2000;%200;
+%max_epoch = 40; %200; %rnn seq %20; %rnn vect
 
 norm_fli = 1;
 norm_flo = 1;
+
+drop_out = 0;
 
 regNets = cell([n_sess, 1]);
 identNets = cell([n_sess, 1]);
@@ -154,15 +166,21 @@ dataModDir = '~/data/Weather_data';
 %% Train or pre-load regNets
 for i = 1:n_sess
 
-    %regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %%regNet = LinRegNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = AnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = ReluNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+
     %regNet = KgNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+
+    regNet = VTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = BtransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = DpTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = DpBatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -175,7 +193,7 @@ for i = 1:n_sess
     %regNet = CnnSpecNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = CnnSpec2Net2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     
-    regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = LstmValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruValNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = GruVal3Net2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
@@ -189,7 +207,7 @@ for i = 1:n_sess
     %regNet = RbfNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
     %regNet = TransNetSeq2D(x_off, x_in, t_in, y_off, y_out, t_out, ts_out, ini_rate, max_epoch);
 
-    %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = LstmNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch); %todo
     %regNet = GruNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
 
@@ -211,18 +229,18 @@ for i = 1:n_sess
 
     if ~isfile(dataModFile)
 
-    % GPU on
-    gpuDevice(1);
-    reset(gpuDevice(1));
+        % GPU on
+        gpuDevice(1);
+        reset(gpuDevice(1));
     
-    regNet = regNet.Train(i, X, Y);
+        regNet = regNet.Train(i, X, Y);
 
-    % GPU off
-    delete(gcp('nocreate'));
-    gpuDevice([]);    
+        % GPU off
+        delete(gcp('nocreate'));
+        gpuDevice([]);    
 
-    fprintf('Saving %s %d\n', dataModFile, i);
-    save(dataModFile, 'regNet');
+        fprintf('Saving %s %d\n', dataModFile, i);
+        save(dataModFile, 'regNet');
 
     else
 
@@ -241,6 +259,9 @@ end
 %% Attention Input Identity net
 % Train or pre-load Identity nets
 
+max_epoch = 20;
+useIdentNets = 1;
+
 for i = 1:n_sess
 
     identNet = ReluNetCl(x_off, x_in, t_in, n_sess, ini_rate, max_epoch);
@@ -253,30 +274,34 @@ for i = 1:n_sess
         '.', string(y_off), '.', string(y_out), '.', string(t_out),...
         '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
 
-    if isfile(dataIdentFile)
-        fprintf('Loading Ident net %d from %s\n', i, dataIdentFile);
-        load(dataIdentFile, 'identNet');
-    else
+    if useIdentNets ~= 0
 
-        fprintf('Training Ident net %d\n', i);
+        if isfile(dataIdentFile)
+            fprintf('Loading Ident net %d from %s\n', i, dataIdentFile);
+            load(dataIdentFile, 'identNet');
+        else
+
+            fprintf('Training Ident net %d\n', i);
 
             % GPU on
-    gpuDevice(1);
-    reset(gpuDevice(1));
+            gpuDevice(1);
+            reset(gpuDevice(1));
 
-        tNet = trainNetwork(XI(:, 1:k_ob*i)', C(1:k_ob*i)', identNet.lGraph, identNet.options);
+            tNet = trainNetwork(XI(:, 1:k_ob*i)', C(1:k_ob*i)', identNet.lGraph, identNet.options);
 
             % GPU off
-    delete(gcp('nocreate'));
-    gpuDevice([]);  
+            delete(gcp('nocreate'));
+            gpuDevice([]);  
 
-        identNet.trainedNet = tNet;
-        identNet.lGraph = tNet.layerGraph; 
+            identNet.trainedNet = tNet;
+            identNet.lGraph = tNet.layerGraph; 
 
-        save(dataIdentFile, 'identNet');
+            save(dataIdentFile, 'identNet');
+        end
+
+        identNets{i} = identNet;
+
     end
-
-    identNets{i} = identNet;
 end
 
 
@@ -297,7 +322,6 @@ t_sess = n_sess;
 %Just one immediate prediction of length t_out (if 0, how many t_out fit
 %into l_test)
 k_tob = 0;
-
 [X2, Y2, Yh2, Yhs2, Bti, Bto, XI2, Sx2, Sy2, k_tob] = regNets{1}.TestTensors(M, l_sess, l_test, t_sess, sess_off, offset, norm_fli, norm_flo, Bi, Bo, k_tob);
 
 %% test

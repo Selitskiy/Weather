@@ -1,4 +1,4 @@
-classdef SigNet2D < BaseNet2D & MLPInputNet2D
+classdef SigNet2D < SigLayers2D & BaseNet2D & MLPInputNet2D
 
     properties
 
@@ -7,6 +7,7 @@ classdef SigNet2D < BaseNet2D & MLPInputNet2D
     methods
         function net = SigNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch)
 
+            net = net@SigLayers2D();
             net = net@BaseNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
             net = net@MLPInputNet2D();
 
@@ -15,30 +16,12 @@ classdef SigNet2D < BaseNet2D & MLPInputNet2D
         end
 
 
-        function [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
+        function [net, X, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = TrainTensors(net, M, l_sess, n_sess, norm_fli, norm_flo)
 
-            [net, X, Y, Bi, Bo, Sx, Sy, k_ob] = TrainTensors@MLPInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
+            [net, X, Y, Bi, Bo, XI, C, Sx, Sy, k_ob] = TrainTensors@MLPInputNet2D(net, M, l_sess, n_sess, norm_fli, norm_flo);
 
-            layers = [
-                featureInputLayer(net.m_in)
-                fullyConnectedLayer(net.k_hid1)
-                sigmoidLayer
-                fullyConnectedLayer(net.k_hid2)
-                sigmoidLayer
-                fullyConnectedLayer(net.n_out)
-                regressionLayer
-            ];
+            net = Create(net);
 
-            net.lGraph = layerGraph(layers);
-
-            net.options = trainingOptions('adam', ...
-                'ExecutionEnvironment','parallel',...
-                'Shuffle', 'every-epoch',...
-                'MiniBatchSize', net.mb_size, ...
-                'InitialLearnRate', net.ini_rate, ...
-                'MaxEpochs',net.max_epoch);
-
-                 %'Plots', 'training-progress',...
         end
 
 

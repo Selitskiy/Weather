@@ -1,10 +1,10 @@
-classdef ReluLayers2D
+classdef SigLayers2D
     properties
     end
 
     methods
 
-        function net = ReluLayers2D()
+        function net = SigLayers2D()
         end
 
 
@@ -13,11 +13,9 @@ classdef ReluLayers2D
             layers = [
                 featureInputLayer(net.m_in)
                 fullyConnectedLayer(net.k_hid1)
-                reluLayer
-                dropoutLayer(0.66)
+                sigmoidLayer
                 fullyConnectedLayer(net.k_hid2)
-                reluLayer
-                dropoutLayer(0.66)
+                sigmoidLayer
                 fullyConnectedLayer(net.n_out)
                 regressionLayer
             ];
