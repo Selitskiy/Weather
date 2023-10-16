@@ -50,23 +50,23 @@ dataDir = '~/data/Weather_data';
 
 
 %Scenario 1
-%dataFile = 'Measurements 04_2022-04_2023 Scenario1.xlsx';
-%yLab = 'Soil Moisture (%)';
+dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
+yLab = 'Soil Moisture (%)';
 %Scenario 2
-dataFile = 'Measurements 04_2022-04_2023 Scenario2.xlsx';
-yLab = 'ORP Smooth_mV';
+%dataFile = 'Measurements 04_2022-06_2023 Scenario2.xlsx';
+%yLab = 'ORP Smooth_mV';
 %Scenario 3
-%dataFile = 'Measurements 04_2022-04_2023 Scenario3.xlsx';
+%dataFile = 'Measurements 04_2022-06_2023 Scenario3.xlsx';
 %yLab = 'Water EC (muS/cm)';
 %Scenario 4
-%dataFile = 'Measurements 04_2022-04_2023 Scenario4.xlsx';
+%dataFile = 'Measurements 04_2022-06_2023 Scenario4.xlsx';
 %yLab = 'PH Smooth';
 
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 3;
-d_div = 24; %experiment
+d_mult = 7; %3;
+d_div = 36; %24; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
 
@@ -79,9 +79,9 @@ M_div = d_div; %experiment
 Mt = readmatrix(dataFullName);
 
 % Scenario 1
-%M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
+M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 % Scenario 2-4
-M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
+%M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
 
 [l_whole_ex, ~] = size(M);
 
@@ -95,15 +95,15 @@ t_in = floor(144/d_div*d_mult); %experiment
 
 % output dimensions (parms x days)
 % Scenario 2-4
-y_off = 12;
-y_out = 1;
+%y_off = 12;
+%y_out = 1;
 
 % Scenario 1
-%y_off = 10;
-%y_out = 3;
+y_off = 10;
+y_out = 3;
 
 %t_out = 144*d_mult;
-t_out = floor(144/d_div*d_mult); %experiment
+t_out = 1; %floor(144/d_div*d_mult); %experiment
 
 
 %ts_out = 36*d_mult; 
@@ -119,7 +119,8 @@ l_whole = l_whole_ex;
 % Break the whole dataset in training sessions,
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
-l_sess = floor(12/d_mult*part_mult)*t_in + t_out + t_in; %12*t_in + t_out + t_in;
+%l_sess = floor(12/d_mult*part_mult)*t_in + t_out + t_in; 
+l_sess = ceil(14/d_mult*part_mult)*t_in + t_out + t_in;
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -148,7 +149,7 @@ end
 
 
 ini_rate = 0.001; 
-max_epoch = 400; %500; %mlp 2000;%200;
+max_epoch = 400; %mlp 2000;%200;
 %max_epoch = 40; %200; %rnn seq %20; %rnn vect
 
 norm_fli = 1;
@@ -176,11 +177,13 @@ for i = 1:n_sess
     %regNet = TanhNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = RbfNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
-    regNet = VTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = VTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = TransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = BtransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = DpTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = DpBatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = Dp2BatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -260,11 +263,11 @@ end
 % Train or pre-load Identity nets
 
 max_epoch = 20;
-useIdentNets = 1;
+useIdentNets = 0;
 
 for i = 1:n_sess
 
-    identNet = ReluNetCl(x_off, x_in, t_in, n_sess, ini_rate, max_epoch);
+    identNet = ReluNet2Cl(x_off, x_in, t_in, n_sess, ini_rate, max_epoch);
     identNet.mb_size = 32;
     identNet = identNet.Create();
 
@@ -317,7 +320,7 @@ l_marg = 1;
 
 % Number of training sessions with following full-size test sessions 
 %t_sess = floor((l_whole - l_sess) / l_test);
-t_sess = n_sess;
+t_sess = n_sess-1; %n_sess;
 
 %Just one immediate prediction of length t_out (if 0, how many t_out fit
 %into l_test)
