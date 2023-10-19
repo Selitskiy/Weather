@@ -15,40 +15,6 @@ dataDir = '~/data/Weather_data';
 
 
 
-%%dataFile = 'measurements_July2022_cleared.xlsx';
-%%dataFile = 'measurements_July-October2022_cleared.xlsx';
-%dataFile = 'Measurements_04_2022-04_2023.xlsx';
-
-%M_off = 1; %4300; %1;
-%M_div = 12; %1;
-
-%Mt = readmatrix(dataFullName);
-%%M = Mt(:, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
-%M = Mt(M_off:M_div:end, [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
-%[l_whole_ex, ~] = size(M);
-
-
-% input dimesion (parms x days)
-%%x_off = 10;
-%%x_in = 3;
-
-%x_off = 0;
-%x_in = 13;
-
-%d_mult = 3;
-
-%%x_off = 0;
-%%x_in = 10;
-%t_in = 144*d_mult;
-
-% output dimensions (parms x days)
-%y_off = 10;
-%y_out = 3;
-%t_out = 144*d_mult;
-%ts_out = 36*d_mult; 
-
-
-
 %Scenario 1
 dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
 yLab = 'Soil Moisture (%)';
@@ -65,7 +31,7 @@ yLab = 'Soil Moisture (%)';
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 7; %3;
+d_mult = 3; %3;
 d_div = 36; %24; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
@@ -120,7 +86,7 @@ l_whole = l_whole_ex;
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
 %l_sess = floor(12/d_mult*part_mult)*t_in + t_out + t_in; 
-l_sess = ceil(14/d_mult*part_mult)*t_in + t_out + t_in;
+l_sess = ceil(14/d_mult*part_mult)*t_in + 2*t_in + t_out + t_in; %extra t_in for AE range
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -163,6 +129,7 @@ identNets = cell([n_sess, 1]);
 %Models direrctory
 dataModDir = '~/data/Weather_data';
 
+useRetrain = 0;
 
 %% Train or pre-load regNets
 for i = 1:n_sess
@@ -231,6 +198,11 @@ for i = 1:n_sess
         '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
 
     if ~isfile(dataModFile)
+
+        if (useRetrain) && (i>1)
+            regNet.trainedNet = regNets{i-1}.trainedNet;
+            regNet.lGraph = regNets{i-1}.trainedNet.layerGraph;   
+        end
 
         % GPU on
         gpuDevice(1);
@@ -320,7 +292,8 @@ l_marg = 1;
 
 % Number of training sessions with following full-size test sessions 
 %t_sess = floor((l_whole - l_sess) / l_test);
-t_sess = n_sess-1; %n_sess;
+t_sess = n_sess; 
+
 
 %Just one immediate prediction of length t_out (if 0, how many t_out fit
 %into l_test)
