@@ -3,12 +3,8 @@ clearvars -global;
 clear all; close all; clc;
 
 addpath('~/ANNLib/');
+addpath('~/Weather/');
 
-% Mem cleanup
-%ngpu = gpuDeviceCount();
-%for i=1:ngpu
-%    reset(gpuDevice(i));
-%end
 
 %% Load data
 dataDir = '~/data/Weather_data';
@@ -31,7 +27,7 @@ yLab = 'Soil Moisture (%)';
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 3; %3;
+d_mult = 21; %3;
 d_div = 36; %24; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
@@ -115,11 +111,14 @@ end
 
 
 ini_rate = 0.001; 
-max_epoch = 400; %mlp 2000;%200;
+max_epoch = 500; %mlp 2000;%200;
 %max_epoch = 40; %200; %rnn seq %20; %rnn vect
 
 norm_fli = 1;
 norm_flo = 1;
+
+%injevted metadata (timestams and log timestamps)
+k_inj = 2;
 
 drop_out = 0;
 
@@ -150,7 +149,12 @@ for i = 1:n_sess
     %regNet = DpTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = DpBatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = Dp2BatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+
+    %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
+    %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
