@@ -27,8 +27,8 @@ yLab = 'Soil Moisture (%)';
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 21; %3;
-d_div = 36; %24; %experiment
+d_mult = 7; %3;
+d_div = 24; %36; %24; 12; 6; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
 
@@ -49,8 +49,10 @@ M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 
 
 % input dimesion (parms x days)
+% Scenario 1
 x_off = 0;
 x_in = 13;
+
 
 %t_in = 144*d_mult;
 t_in = floor(144/d_div*d_mult); %experiment
@@ -153,8 +155,8 @@ for i = 1:n_sess
     %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -336,9 +338,9 @@ fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MA
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
 
 
-%[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Y2, Yh2); 
+[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Y2, Yh2, k_tob); 
 
-%fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, mean(ma_errC), std(ma_errC));
+fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, mean(ma_errC), std(ma_errC));
 
 %%
 regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName, yLab);
