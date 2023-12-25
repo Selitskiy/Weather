@@ -27,8 +27,8 @@ yLab = 'Soil Moisture (%)';
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 7; %3;
-d_div = 24; %36; %24; 12; 6; %experiment
+d_mult = 3; %14; %7; %3;
+d_div = 4; %2 hours %%36; %24; 12; 6; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
 
@@ -38,7 +38,17 @@ M_off = 1;
 %M_div = 14/d_mult; %2 weeks;
 M_div = d_div; %experiment
 
-Mt = readmatrix(dataFullName);
+Mti = readmatrix(dataFullName);
+
+%Convert to 30 minutes interval
+[n,~] = size(Mti);
+t_sw = 27860;
+
+Mt1 = Mti(1:3:t_sw-1,:);
+Mt2 = Mti(t_sw:2:end,:);
+Mt = vertcat(Mt1, Mt2);
+m_day = 24 * 2;
+
 
 % Scenario 1
 M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
@@ -55,7 +65,7 @@ x_in = 13;
 
 
 %t_in = 144*d_mult;
-t_in = floor(144/d_div*d_mult); %experiment
+t_in = floor(m_day/d_div*d_mult); %experiment
 
 % output dimensions (parms x days)
 % Scenario 2-4
@@ -68,6 +78,7 @@ y_out = 3;
 
 %t_out = 144*d_mult;
 t_out = 1; %floor(144/d_div*d_mult); %experiment
+t_out_ae = t_in; %autoencoder span
 
 
 %ts_out = 36*d_mult; 
@@ -84,7 +95,12 @@ l_whole = l_whole_ex;
 % Set training session length (space to slide window of size t_in datapoints, 
 % plus length of last label t_out, plus size of input for test on next session), 
 %l_sess = floor(12/d_mult*part_mult)*t_in + t_out + t_in; 
-l_sess = ceil(14/d_mult*part_mult)*t_in + 2*t_in + t_out + t_in; %extra t_in for AE range
+%l_sess = ceil(14/d_mult*part_mult)*t_in + 2*t_in + t_out_ae; %extra t_in for AE range
+
+% 4 training days (3*t_in+1 batch)
+% plus label (which is t_in for AE), plus space for test (both input and output peeking 1 position to other session)
+l_sess = 4*t_in + t_out_ae + t_in + t_out_ae-1; 
+
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -154,9 +170,9 @@ for i = 1:n_sess
 
     %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
+    regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -324,26 +340,26 @@ gpuDevice([]);
 %end
 
 if(norm_flo)
-    [Y, Y2, Yhs2] = regNets{1}.ReScaleOut(Y, Y2, Yhs2, Bo, Bto, n_sess, t_sess, sess_off, k_ob, k_tob);
+    [Y, Y2, Yhs2, Ya2, Yha2, Sa] = regNets{1}.ReScaleOut(Y, Y2, Yhs2, Bo, Bto, n_sess, t_sess, sess_off, k_ob, k_tob, Yh2);
 end
 
 %% Calculate errors
-[Em, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = regNets{1}.Calc_mape(Y2, Yh2); 
+[Em, S2, S2Mean, S2Std, S2s, ma_err, sess_ma_idx, ob_ma_idx, mi_err, sess_mi_idx, ob_mi_idx] = regNets{1}.Calc_mape(Ya2, Yha2); 
 
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MeanMaxAPErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
 
 
-[Er, S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Y2, Yh2); 
+[Er, S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Ya2, Yha2); 
 
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
 
 
-[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Y2, Yh2, k_tob); 
+[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Ya2, Yha2, k_tob); 
 
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, mean(ma_errC), std(ma_errC));
 
 %%
-regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName, yLab);
+regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName, yLab, Ya2, Sa);
 
 %%
 %regNets{1}.TestIn_graph(M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName);
