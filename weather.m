@@ -169,10 +169,22 @@ for i = 1:n_sess
     %regNet = Dp2BatchTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
     %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
-    %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    %%regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch, k_inj, 3/x_in);
-    regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    regNet = ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = Lr2ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = Lr3ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %regNet = resReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = res2LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = res3LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resTTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resBBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = res3BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -216,7 +228,7 @@ for i = 1:n_sess
     dataModFile = strcat(dataModDir,'/', 'wearther.', modelName, '.', string(i), '.', string(n_sess),...
         '.', string(M_off), '.', string(M_div), '.', dataFile,...
         '.', string(x_off), '.', string(x_in), '.', string(t_in),...
-        '.', string(y_off), '.', string(y_out), '.', string(t_out),...
+        '.', string(y_off), '.', string(y_out), '.', string(t_out),'.', string(t_out_ae),...
         '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
 
     if ~isfile(dataModFile)
@@ -268,7 +280,7 @@ for i = 1:n_sess
     dataIdentFile = strcat(dataModDir,'/', 'wearther.ident.', string(i), '.', string(n_sess),...
         '.', string(M_off), '.', string(M_div), '.', dataFile,...
         '.', string(x_off), '.', string(x_in), '.', string(t_in),...
-        '.', string(y_off), '.', string(y_out), '.', string(t_out),...
+        '.', string(y_off), '.', string(y_out), '.', string(t_out),'.', string(t_out_ae),...
         '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
 
     if useIdentNets ~= 0
@@ -364,16 +376,30 @@ regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_s
 %%
 %regNets{1}.TestIn_graph(M, l_whole_ex, X, Y, X2, Y2, Sx, Sy, Sx2, Sy2, l_whole, n_sess, l_sess, k_ob, k_tob, t_sess, sess_off, offset, l_marg, modelName);
 
-%%
+%% Write results
 
-Dout.M = M;
-Dout.Y2 = Y2;
-Dout.Sy2 = Sy2;
+%% Write per-image scores to a file
 outFile = strcat(dataModDir,'/', 'wearther_out.', modelName, '.', string(n_sess),...
         '.', string(M_off), '.', string(M_div), '.', dataFile,...
         '.', string(x_off), '.', string(x_in), '.', string(t_in),...
-        '.', string(y_off), '.', string(y_out), '.', string(t_out),...
-        '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
+        '.', string(y_off), '.', string(y_out), '.', string(t_out), '.', string(t_out_ae),...
+        '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.txt');
 
-fprintf('Saving %s\n', outFile);
-save(outFile, 'Dout');
+fd = fopen( outFile,'w' );
+
+fprintf(fd, "MAPErr: %f+-%f  RMSErr: %f+-%f CRMSErr: %f+-%f\n", S2, S2Std,S2Q, S2StdQ,S2C, S2StdC);
+
+fclose(fd);
+
+
+%Dout.M = M;
+%Dout.Y2 = Y2;
+%Dout.Sy2 = Sy2;
+%outFile = strcat(dataModDir,'/', 'wearther_out.', modelName, '.', string(n_sess),...
+%        '.', string(M_off), '.', string(M_div), '.', dataFile,...
+%        '.', string(x_off), '.', string(x_in), '.', string(t_in),...
+%        '.', string(y_off), '.', string(y_out), '.', string(t_out),...
+%        '.', string(norm_fli), '.', string(norm_flo), '.', string(ini_rate), '.', string(max_epoch), '.mat');
+
+%fprintf('Saving %s\n', outFile);
+%save(outFile, 'Dout');
