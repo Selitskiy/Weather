@@ -12,14 +12,14 @@ dataDir = '~/data/Weather_data';
 
 
 %Scenario 1
-dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
-yLab = 'Soil Moisture (%)';
+%dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
+%yLab = 'Soil Moisture (%)';
 %Scenario 2
 %dataFile = 'Measurements 04_2022-06_2023 Scenario2.xlsx';
 %yLab = 'ORP Smooth_mV';
 %Scenario 3
-%dataFile = 'Measurements 04_2022-06_2023 Scenario3.xlsx';
-%yLab = 'Water EC (muS/cm)';
+dataFile = 'Measurements 04_2022-06_2023 Scenario3.xlsx';
+yLab = 'Water EC (muS/cm)';
 %Scenario 4
 %dataFile = 'Measurements 04_2022-06_2023 Scenario4.xlsx';
 %yLab = 'PH Smooth';
@@ -27,7 +27,7 @@ yLab = 'Soil Moisture (%)';
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 3; %14; %7; %3;
+d_mult = 7; %14; %7; %3;
 d_div = 4; %2 hours %%36; %24; 12; 6; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
@@ -51,9 +51,9 @@ m_day = 24 * 2;
 
 
 % Scenario 1
-M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
+%M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
 % Scenario 2-4
-%M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
+M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
 
 [l_whole_ex, ~] = size(M);
 
@@ -69,12 +69,12 @@ t_in = floor(m_day/d_div*d_mult); %experiment
 
 % output dimensions (parms x days)
 % Scenario 2-4
-%y_off = 12;
-%y_out = 1;
+y_off = 12;
+y_out = 1;
 
 % Scenario 1
-y_off = 10;
-y_out = 3;
+%y_off = 10;
+%y_out = 3;
 
 %t_out = 144*d_mult;
 t_out = 1; %floor(144/d_div*d_mult); %experiment
@@ -170,21 +170,43 @@ for i = 1:n_sess
 
     %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
-    regNet = ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = Lr2ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = Lr3ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = TTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = VaswaniTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %%regNet = TTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = Lr2ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = Lr3ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = Lr4ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %regNet = TLr3ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %%regNet = TBLrBAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = TLrTLrAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = LrBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = GlBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = LLrBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = TnLlrTTnLlrBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %regNet = TnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TnTTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    
 
     %regNet = resReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = res2LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = res3LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = resTTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    regNet = resT3LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = resBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = resTBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = resBBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = resTnTTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
+    %%regNet = resBBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %%regNet = res3BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
     %regNet = SeqCnnNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -361,12 +383,12 @@ end
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, MAPErr: %f+-%f MeanMaxAPErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2, S2Std, mean(ma_err), std(ma_err));
 
 
-[Er, S2Q, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Ya2, Yha2); 
+[Er, S2Q, S2MeanQ, S2StdQ, S2sQ, ma_errQ, sess_ma_idxQ, ob_ma_idxQ, mi_errQ, sess_mi_idxQ, ob_mi_idxQ] = regNets{1}.Calc_rmse(Ya2, Yha2); 
 
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2Q, S2StdQ, mean(ma_errQ), std(ma_errQ));
 
 
-[Ec, S2C, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Ya2, Yha2, k_tob); 
+[Ec, S2C, S2MeanC, S2StdC, S2sC, ma_errC, sess_ma_idxC, ob_ma_idxC, mi_errC, sess_mi_idxC, ob_mi_idxC] = regNets{1}.Calc_cont_rmse(Ya2, Yha2, k_tob); 
 
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxRSErr %f+-%f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, mean(ma_errC), std(ma_errC));
 
@@ -387,7 +409,7 @@ outFile = strcat(dataModDir,'/', 'wearther_out.', modelName, '.', string(n_sess)
 
 fd = fopen( outFile,'w' );
 
-fprintf(fd, "MAPErr: %f+-%f  RMSErr: %f+-%f CRMSErr: %f+-%f\n", S2, S2Std,S2Q, S2StdQ,S2C, S2StdC);
+fprintf(fd, "MAPErr: %f+-%f  RMSErr: %f+-%f CRMSErr: %f+-%f\n", S2Mean, S2Std, S2MeanQ, S2StdQ, S2MeanC, S2StdC);
 
 fclose(fd);
 
