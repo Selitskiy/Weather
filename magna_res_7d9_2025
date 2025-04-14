@@ -1,0 +1,27 @@
+vasTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.010930+-0.008429 MeanMaxAPErr 0.051651
+vasTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.138309+-0.088309 MeanMaxRSErr 0.438005
+vasTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.244368+-0.135069 MeanMaxCRSErr 0.468608
+>> 
+vasTransAe2dC, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.014534+-0.009425 MeanMaxAPErr 0.058623
+vasTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.165931+-0.088876 MeanMaxRSErr 0.453069
+vasTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.257315+-0.106424 MeanMaxCRSErr 0.537551
+>> 
+
+
+reluAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.012319+-0.008440 MeanMaxAPErr 0.055256
+reluAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.158511+-0.098947 MeanMaxRSErr 0.477549
+reluAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.242451+-0.143313 MeanMaxCRSErr 0.446490
+>> 
+reluAe2dC, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.011493+-0.007119 MeanMaxAPErr 0.055252
+reluAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.145273+-0.086257 MeanMaxRSErr 0.459942
+reluAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.242921+-0.136285 MeanMaxCRSErr 0.514472
+>> 
+
+bTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.011894+-0.008693 MeanMaxAPErr 0.054988
+bTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.153598+-0.097141 MeanMaxRSErr 0.493436
+bTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.210534+-0.087512 MeanMaxCRSErr 0.354145
+>> 
+bTransAe2dC, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, MAPErr: 0.012308+-0.007975 MeanMaxAPErr 0.062905
+bTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, RMSErr: 0.158506+-0.094907 MeanMaxRSErr 0.523991
+bTransAe2d, dataFN Measurements 04_2022-06_2023 Scenario4.xlsx, NormFi:1, M_in:1092, N_out:1, Tr_sess:8, Ts_sess:8, Cont RMSErr: 0.203503+-0.100574 MeanMaxCRSErr 0.409795
+>> 
