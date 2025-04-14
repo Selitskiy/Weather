@@ -5,6 +5,9 @@ clear all; close all; clc;
 addpath('~/ANNLib/');
 addpath('~/Weather/');
 
+gpus = [1]; %[1 2];
+[~, nGpus] = size(gpus);
+
 
 %% Load data
 dataDir = '~/data/Weather_data';
@@ -12,23 +15,30 @@ dataDir = '~/data/Weather_data';
 
 
 %Scenario 1
-dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
-yLab = 'Soil Moisture (%)';
+%scF = 1;
+%dataFile = 'Measurements 04_2022-06_2023 Scenario1.xlsx';
+%yLab = 'Soil Moisture (%)';
+
 %Scenario 2
-%dataFile = 'Measurements 04_2022-06_2023 Scenario2.xlsx';
-%yLab = 'ORP Smooth_mV';
+scF = 2;
+dataFile = 'Measurements 04_2022-06_2023 Scenario2.xlsx';
+yLab = 'ORP Smooth_mV';
+
 %Scenario 3
+%scF = 3;
 %dataFile = 'Measurements 04_2022-06_2023 Scenario3.xlsx';
 %yLab = 'Water EC (muS/cm)';
+
 %Scenario 4
+%scF = 4;
 %dataFile = 'Measurements 04_2022-06_2023 Scenario4.xlsx';
 %yLab = 'PH Smooth';
 
 dataFullName = strcat(dataDir,'/',dataFile);
 
 %Number of days
-d_mult = 3; %14; %7; %3;
-d_div = 4; %2 hours %%36; %24; 12; 6; %experiment
+d_mult = 28; %21; %14; %7; %3;
+d_div = 4;    %2 hours %%36; %24; 12; 6; %experiment
 part_mult = 1;
 %part_mult = 5; %15 days
 
@@ -51,9 +61,12 @@ m_day = 24 * 2;
 
 
 % Scenario 1
-M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
+if scF == 1
+    M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17]);
+else
 % Scenario 2-4
-%M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
+    M = Mt(floor(M_off:M_div:end), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17]);
+end
 
 [l_whole_ex, ~] = size(M);
 
@@ -68,13 +81,16 @@ x_in = 13;
 t_in = floor(m_day/d_div*d_mult); %experiment
 
 % output dimensions (parms x days)
-% Scenario 2-4
-%y_off = 12;
-%y_out = 1;
+if scF == 1
+    % Scenario 1
+    y_off = 10;
+    y_out = 3;
+else
+    % Scenario 2-4
+    y_off = 12;
+    y_out = 1;
+end
 
-% Scenario 1
-y_off = 10;
-y_out = 3;
 
 %t_out = 144*d_mult;
 t_out = 1; %floor(144/d_div*d_mult); %experiment
@@ -101,6 +117,7 @@ l_whole = l_whole_ex;
 % plus label (which is t_in for AE), plus space for test (both input and output peeking 1 position to other session)
 l_sess = 4*t_in + t_out_ae + t_in + t_out_ae-1; 
 
+%l_sess = 3*t_in + t_out_ae + t_in + t_out_ae-1; %12 apr 2025 
 
 % Test output period - if same as training period, will cover whole data
 l_test = l_sess; %t_out; %l_sess;
@@ -170,6 +187,7 @@ for i = 1:n_sess
 
     %regNet = Dp2BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
 
+
     %regNet = VaswaniTransNet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %regNet = ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
@@ -179,8 +197,8 @@ for i = 1:n_sess
     %%regNet = Lr4ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = TLr3ReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 1); %3/x_in);
+    regNet = BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %regNet = TBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %%regNet = TBLrBAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %%regNet = TLrTLrAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
@@ -190,9 +208,10 @@ for i = 1:n_sess
     %%regNet = TnLlrTTnLlrBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
 
     %regNet = TnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    %regNet = TTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
-    regNet = TnTTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = TTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+    %%regNet = TnTTnBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     
+
 
     %%regNet = resReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %%regNet = res2LrReLUAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
@@ -207,6 +226,7 @@ for i = 1:n_sess
 
     %%regNet = resBBTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
     %%regNet = res3BTransAENet2D(x_off, x_in, t_in, y_off, y_out, t_out, t_out_ae, ini_rate, max_epoch, k_inj, 3/x_in);
+
 
 
     %regNet = SeqCnnMlpNet2D(x_off, x_in, t_in, y_off, y_out, t_out, ini_rate, max_epoch);
@@ -262,8 +282,12 @@ for i = 1:n_sess
         end
 
         % GPU on
-        gpuDevice(1);
-        reset(gpuDevice(1));
+        %gpuDevice(1);
+        %reset(gpuDevice(1));
+        for g=1:nGpus
+            gpuDevice(gpus(g));
+            reset(gpuDevice(gpus(g)));
+        end
     
         regNet = regNet.Train(i, X, Y);
 
@@ -291,8 +315,8 @@ end
 %% Attention Input Identity net
 % Train or pre-load Identity nets
 
-max_epoch = 20;
-useIdentNets = 0;
+max_epoch = 20; %30; 12 Apr 2025
+useIdentNets = 1; %1; %0;
 
 for i = 1:n_sess
 
@@ -316,8 +340,12 @@ for i = 1:n_sess
             fprintf('Training Ident net %d\n', i);
 
             % GPU on
-            gpuDevice(1);
-            reset(gpuDevice(1));
+            %gpuDevice(1);
+            %reset(gpuDevice(1));
+            for g=1:nGpus
+                gpuDevice(gpus(g));
+                reset(gpuDevice(gpus(g)));
+            end
 
             tNet = trainNetwork(XI(:, 1:k_ob*i)', C(1:k_ob*i)', identNet.lGraph, identNet.options);
 
@@ -360,8 +388,12 @@ k_tob = 0;
 %% test
 
 % GPU on
-gpuDevice(1);
-reset(gpuDevice(1));
+%gpuDevice(1);
+%reset(gpuDevice(1));
+for g=1:nGpus
+    gpuDevice(gpus(g));
+    reset(gpuDevice(gpus(g)));
+end
     
 [X2, Y2] = regNets{1}.Predict(X2, Y2, regNets, XI2, identNets, t_sess, sess_off, k_tob);
 
@@ -394,6 +426,8 @@ fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, RM
 fprintf('%s, dataFN %s, NormFi:%d, M_in:%d, N_out:%d, Tr_sess:%d, Ts_sess:%d, Cont RMSErr: %f+-%f MeanMaxCRSErr %f\n', modelName, dataFile, norm_fli, regNets{1}.m_in, regNets{1}.n_out, n_sess, t_sess, S2C, S2StdC, ma_errC);
 
 %%
+%regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName, yLab, Ya2, Sa);
+
 regNets{1}.Err_graph(M, Em, Er, l_whole_ex, Y2, Sy2, l_whole, l_sess, k_tob, t_sess, sess_off, offset, l_marg, modelName, yLab, Ya2, Sa);
 
 %%
